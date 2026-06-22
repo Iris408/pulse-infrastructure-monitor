@@ -8,7 +8,11 @@ A Python-based system monitoring application that tracks CPU, memory, disk usage
 
 <img src="./screenshots/system-health-monitor.png" width="500"/>
 
-# Features | 機能 
+## Current Status
+
+System Health Monitor is a Python monitoring project with Docker support, Slack/email alerts, logging, a FastAPI dashboard, configurable thresholds, and a `/health` endpoint.
+
+## Features | 機能 
 
 | English | 日本語 | Status |
 - CPU, memory, disk, and uptime monitoring | CPU、メモリ、ディスク、稼働時間の監視 | ✅ Complete 
@@ -21,6 +25,15 @@ A Python-based system monitoring application that tracks CPU, memory, disk usage
 - `/health` JSON endpoint | `/health` JSONエンドポイント | ✅ Complete 
 - Configurable thresholds using environment variables | 環境変数によるしきい値の設定 | ✅ Complete 
 - EN/JP code comments for learning and review | 学習と復習のための英語/日本語コードコメント | ✅ Complete 
+
+### Next Roadmap
+- Add alert history storage
+- Add `/alerts` endpoint
+- Improve dashboard layout
+- Add architecture diagram
+- Add screenshots
+- Add GitHub Actions check
+- Add optional PostgreSQL or SQLite alert storage
 
 ## Planned Features | 追加予定の機能
 
