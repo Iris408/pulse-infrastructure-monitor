@@ -54,6 +54,13 @@ WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD", 75))
 CRITICAL_THRESHOLD = int(os.getenv("CRITICAL_THRESHOLD", 95))
 REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", 300))
 
+ALERT_COOLDOWN_SECONDS = int(os.getenv("ALERT_COOLDOWN_SECONDS", 1800))
+
+last_alert_times = {
+    "cpu": 0,
+    "memory": 0,
+    "disk": 0,
+}
 
 # =========================================
 # EN: Get current CPU usage percentage
@@ -178,6 +185,26 @@ def display_metric(name, value):
 
     return f"{name}: {value}% [{status}]"
 
+# =========================================
+# EN: Check whether an alert can be sent again
+# JP: アラートを再送信できるか確認します
+# KR: 알림을 다시 보낼 수 있는지 확인합니다
+# =========================================
+
+def can_send_alert(alert_type):
+    current_time = time.time()
+    last_sent_time = last_alert_times[alert_type]
+
+    return current_time - last_sent_time >= ALERT_COOLDOWN_SECONDS
+
+# =========================================
+# EN: Update the last sent time for an alert
+# JP: アラートの最終送信時刻を更新します
+# KR: 알림의 마지막 전송 시간을 업데이트합니다
+# =========================================
+
+def update_alert_time(alert_type):
+    last_alert_times[alert_type] = time.time()
 
 # =========================================
 # EN: Send alerts when system usage is too high
@@ -193,6 +220,7 @@ def handle_alerts(cpu, memory, disk):
     if "WARNING" in cpu_status or "CRITICAL" in cpu_status:
         log_alert(f"CPU: {cpu}% - {cpu_status}")
         send_slack_alert(f"CPU ALERT: {cpu}% - {cpu_status}")
+        update_alert_time("cpu")
 
     if "WARNING" in memory_status or "CRITICAL" in memory_status:
         log_alert(f"Memory: {memory}% - {memory_status}")
@@ -201,6 +229,7 @@ def handle_alerts(cpu, memory, disk):
             "Memory Alert",
             f"Memory status triggered an alert: {memory}% - {memory_status}"
         )
+        update_alert_time("memory")
 
     if "WARNING" in disk_status or "CRITICAL" in disk_status:
         log_alert(f"Disk: {disk}% - {disk_status}")
@@ -209,6 +238,7 @@ def handle_alerts(cpu, memory, disk):
             "Disk Alert",
             f"Disk status triggered an alert: {disk}% - {disk_status}"
         )
+        update_alert_time("disk")
 
 
 # =========================================

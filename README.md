@@ -2,7 +2,7 @@
 
 A Python-based system monitoring application that tracks CPU, memory, disk usage, and uptime with threshold-based alerts, logging, Docker support, and a FastAPI dashboard.
 
-**日本語**：CPU、メモリ、ディスク使用量、稼働時間を監視するPythonベースのシステム監視アプリケーションです。しきい値に基づくアラート、ログ記録、Docker対応、FastAPIダッシュボードを備えています。
+CPU、メモリ、ディスク使用量、稼働時間を監視するPythonベースのシステム監視アプリケーションです。しきい値に基づくアラート、ログ記録、Docker対応、FastAPIダッシュボードを備えています。
 
 ## Screenshot / スクリーンショット
 
@@ -12,27 +12,48 @@ A Python-based system monitoring application that tracks CPU, memory, disk usage
 
 System Health Monitor is a Python monitoring project with Docker support, Slack/email alerts, logging, a FastAPI dashboard, configurable thresholds, and a `/health` endpoint.
 
+## Automation / 自動化
+
+System Health Monitor runs automated checks on a configurable refresh interval.
+
+By default, the monitor checks CPU, memory, disk usage, and uptime every 5 minutes.
+
+**日本語**:  
+System Health Monitor は、設定可能な更新間隔で自動的にシステム状態を確認します。
+
+デフォルトでは、CPU、メモリ、ディスク使用量、稼働時間を5分ごとに監視します。
+
+| Setting | Default | Description | 日本語 |
+| --- | --- | --- | --- |
+| `REFRESH_INTERVAL` | `300` | Runs checks every 300 seconds / 5 minutes | 300秒 / 5分ごとに監視を実行 |
+| `WARNING_THRESHOLD` | `75` | Sends a warning when usage is high | 使用率が高い場合に警告 |
+| `CRITICAL_THRESHOLD` | `95` | Sends a critical alert when usage is very high | 使用率が非常に高い場合に重大アラート |
+| `ALERT_COOLDOWN_SECONDS` | `1800` | Prevents repeated alerts from being sent too often | 同じアラートの連続送信を防止 |
+
 ## Features | 機能 
 
 | English | 日本語 | Status |
-- CPU, memory, disk, and uptime monitoring | CPU、メモリ、ディスク、稼働時間の監視 | ✅ Complete 
-- Warning and critical threshold detection | 警告および重大なしきい値の検出 | ✅ Complete 
-- Slack alert integration | Slackアラートとの連携 | ✅ Complete 
-- Email alert integration | メールアラートとの連携 | ✅ Complete 
-- Logging support | ログ記録のサポート | ✅ Complete 
-- Docker container support | Dockerコンテナのサポート | ✅ Complete 
-- FastAPI web dashboard | FastAPIウェブダッシュボード | ✅ Complete 
-- `/health` JSON endpoint | `/health` JSONエンドポイント | ✅ Complete 
-- Configurable thresholds using environment variables | 環境変数によるしきい値の設定 | ✅ Complete 
-- EN/JP code comments for learning and review | 学習と復習のための英語/日本語コードコメント | ✅ Complete 
+| --- | --- | --- |
+| CPU, memory, disk, and uptime monitoring | CPU、メモリ、ディスク、稼働時間の監視 | ✅ Complete |
+| Warning and critical threshold detection | 警告および重大なしきい値の検出 | ✅ Complete |
+| Slack alert integration | Slackアラートとの連携 | ✅ Complete |
+| Email alert integration | メールアラートとの連携 | ✅ Complete |
+| Logging support | ログ記録のサポート | ✅ Complete |
+| Docker container support | Dockerコンテナのサポート | ✅ Complete |
+| FastAPI web dashboard | FastAPIウェブダッシュボード | ✅ Complete |
+| `/health` JSON endpoint | `/health` JSONエンドポイント | ✅ Complete |
+| Configurable thresholds using environment variables | 環境変数によるしきい値の設定 | ✅ Complete |
+| EN/JP code comments for learning and review | 学習と復習のための英語/日本語コードコメント | ✅ Complete |
 
 ### Next Roadmap
+
+- Add alert cooldown documentation
 - Add alert history storage
 - Add `/alerts` endpoint
 - Improve dashboard layout
 - Add architecture diagram
-- Add screenshots
 - Add GitHub Actions check
+- Add automated tests
 - Add optional PostgreSQL or SQLite alert storage
 
 ## Planned Features | 追加予定の機能
@@ -57,12 +78,29 @@ examples/health_log.txt
 ```
 実行時に生成される実際のログは logs/ フォルダに保存されますが、ローカル環境の情報を含む可能性があるため、Git管理から除外しています。
 
-### Environment Variables / 環境変数
+## Environment Variables / 環境変数
 
-This project uses environment variables for alerting and threshold configuration.
-**日本語**: アラート設定としきい値設定に環境変数を使用します。
+This project uses environment variables for alerting, threshold configuration, and automated refresh timing.
 
-# Tech Stack | 技術スタック 
+**日本語**:  
+このプロジェクトでは、アラート設定、しきい値設定、自動更新間隔のために環境変数を使用します。
+
+Create a `.env` file in the project root:
+
+```env
+SLACK_WEBHOOK_URL=your_slack_webhook_url
+EMAIL_ADDRESS=your_email@example.com
+EMAIL_PASSWORD=your_email_password
+TO_EMAIL=recipient@example.com
+
+OK_THRESHOLD=45
+WARNING_THRESHOLD=75
+CRITICAL_THRESHOLD=95
+REFRESH_INTERVAL=300
+ALERT_COOLDOWN_SECONDS=1800
+```
+
+## Tech Stack | 技術スタック 
 
 - Python
 - FastAPI
@@ -74,7 +112,7 @@ This project uses environment variables for alerting and threshold configuration
 - SMTP Email
 - Git/GitHub
 
-# Installation / インストール
+## Installation / インストール
 
 Clone the repository/ リポジトリのクローン:
 ```bash
@@ -90,7 +128,7 @@ Run the monitor/ 監視スクリプトの実行:
 python3 main.py
 ```
 
-# Docker Usage / Dockerでの起動
+## Docker Usage / Dockerでの起動
 
 This project can run inside a Docker container using Docker compose.
 **日本語**:Docker Composeを使用してDockerコンテナ内で実行できます。
@@ -112,7 +150,7 @@ Stop the container/ コンテナの停止:
 docker compose down
 ```
 
-# Project Structure / プロジェクト構成
+## Project Structure / プロジェクト構成
 ```text
 system-health-monitor/
 ├── alerts.py
@@ -130,10 +168,11 @@ system-health-monitor/
     └── system-health-monitor.png
 ```
 
-# FastAPI Dashboard / FastAPI ダッシーボド
+## FastAPI Dashboard / FastAPI ダッシュボード
 The project includes a FastAPI dashboard and a /health JSON endpoint for viewing system monitoring data through a browser or API client.
 
-**日本語**:ブラウザやAPIクライントからシステム監視データを確認できるFastAPIダッシボードと/health JSONエンドポイントが含まれています。
+**日本語**:  
+ブラウザやAPIクライアントからシステム監視データを確認できる FastAPI ダッシュボードと `/health` JSON エンドポイントが含まれています。
 
 Local URLs / ローカルURL
 | Page | URL |
