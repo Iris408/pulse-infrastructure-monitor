@@ -1,4 +1,6 @@
-# System Health Monitor 
+![Backend CI](https://github.com/Iris408/system-health-monitor/actions/workflows/backend-ci.yml/badge.svg)
+
+# System Health Monitor / システム健全性監視
 
 A Python-based system monitoring application that tracks CPU, memory, disk usage, and uptime with threshold-based alerts, logging, Docker support, and a FastAPI dashboard.
 
@@ -44,6 +46,18 @@ System Health Monitor は、設定可能な更新間隔で自動的にシステ�
 | `/health` JSON endpoint | `/health` JSONエンドポイント | ✅ Complete |
 | Configurable thresholds using environment variables | 環境変数によるしきい値の設定 | ✅ Complete |
 | EN/JP code comments for learning and review | 学習と復習のための英語/日本語コードコメント | ✅ Complete |
+| GitHub Actions CI | GitHub Actions CI | ✅ Complete |
+
+## CI/CD
+
+This project uses GitHub Actions to run automated checks on every push and pull request.
+
+Current pipeline:
+
+- Install dependencies
+- Validate Python syntax
+- Run tests when available
+- Build project or Docker image where applicable
 
 ### Next Roadmap
 
@@ -58,7 +72,6 @@ System Health Monitor は、設定可能な更新間隔で自動的にシステ�
 
 ## Planned Features | 追加予定の機能
 
-- GitHub Actions CI | GitHub Actions CI | 🚧 In progress
 - Dashboard UI improvements | ダッシュボードのUI改善 | 🚧 Planned 
 - Add automated tests | 自動テストを追加 | 🚧 Planned 
 - Add historical monitoring charts | 履歴監視チャートを追加 | 🚧 Planned 
@@ -100,19 +113,7 @@ REFRESH_INTERVAL=300
 ALERT_COOLDOWN_SECONDS=1800
 ```
 
-## Tech Stack | 技術スタック 
-
-- Python
-- FastAPI
-- Docker
-- Docker Compose
-- psutil
-- colorama
-- Slack Webhooks
-- SMTP Email
-- Git/GitHub
-
-## Installation / インストール
+# Installation / インストール
 
 Clone the repository/ リポジトリのクローン:
 ```bash
@@ -150,24 +151,6 @@ Stop the container/ コンテナの停止:
 docker compose down
 ```
 
-## Project Structure / プロジェクト構成
-```text
-system-health-monitor/
-├── alerts.py
-├── dashboard.py
-├── docker-compose.yml
-├── Dockerfile
-├── email_alerts.py
-├── examples/
-│   └── health_log.txt
-├── logger.py
-├── main.py
-├── README.md
-├── requirements.txt
-└── screenshots/
-    └── system-health-monitor.png
-```
-
 ## FastAPI Dashboard / FastAPI ダッシュボード
 The project includes a FastAPI dashboard and a /health JSON endpoint for viewing system monitoring data through a browser or API client.
 
@@ -180,3 +163,15 @@ Local URLs / ローカルURL
 | Dashboard | http://localhost:8000 |
 | Health Endpoint | http://localhost:8000/health |
 | Swagger UI | http://localhost:8000/docs |
+
+## Tech Stack | 技術スタック 
+
+- Python
+- FastAPI
+- Docker
+- Docker Compose
+- psutil
+- colorama
+- Slack Webhooks
+- SMTP Email
+- Git/GitHub
