@@ -56,10 +56,34 @@ REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", 300))
 
 ALERT_COOLDOWN_SECONDS = int(os.getenv("ALERT_COOLDOWN_SECONDS", 1800))
 
-last_alert_times = {
-    "cpu": 0,
-    "memory": 0,
-    "disk": 0,
+# EN: Tracks when each metric/severity alert was last sent
+# JP: 各メトリック/重要度のアラート最終送信時刻を記録します
+last_alert_times = {}
+
+# EN: Tracks the last known status for recovery messages
+# JP: 回復メッセージ用に前回の状態を記録します
+last_metric_levels = {
+    "cpu": "OK",
+    "memory": "OK",
+    "disk": "OK",
+}
+
+METRIC_ALERT_CONFIG = {
+    "cpu": {
+        "label": "CPU",
+        "email_subject": "CPU Alert",
+        "send_email": False,
+    },
+    "memory": {
+        "label": "Memory",
+        "email_subject": "Memory Alert",
+        "send_email": True,
+    },
+    "disk": {
+        "label": "Disk",
+        "email_subject": "Disk Alert",
+        "send_email": True,
+    },
 }
 
 # =========================================
@@ -112,16 +136,26 @@ def get_system_uptime():
 # KR: 임계값을 기준으로 사용 상태를 확인합니다
 # =========================================
 
-def check_status(value):
+def get_status_level(value):
     if value >= CRITICAL_THRESHOLD:
+        return "CRITICAL"
+
+    if value >= WARNING_THRESHOLD:
+        return "WARNING"
+
+    return "OK"
+
+
+def check_status(value):
+    status_level = get_status_level(value)
+
+    if status_level == "CRITICAL":
         return f"CRITICAL: Usage is over {CRITICAL_THRESHOLD}%"
 
-    elif value >= WARNING_THRESHOLD:
+    if status_level == "WARNING":
         return f"WARNING: Usage is over {WARNING_THRESHOLD}%"
 
-    else:
-        return f"OK: Usage is below {WARNING_THRESHOLD}%"
-
+    return f"OK: Usage is below {WARNING_THRESHOLD}%"
 
 # =========================================
 # EN: Choose terminal colour based on status
@@ -191,9 +225,9 @@ def display_metric(name, value):
 # KR: 알림을 다시 보낼 수 있는지 확인합니다
 # =========================================
 
-def can_send_alert(alert_type):
+def can_send_alert(alert_key):
     current_time = time.time()
-    last_sent_time = last_alert_times[alert_type]
+    last_sent_time = last_alert_times.get(alert_key, 0)
 
     return current_time - last_sent_time >= ALERT_COOLDOWN_SECONDS
 
@@ -203,8 +237,8 @@ def can_send_alert(alert_type):
 # KR: 알림의 마지막 전송 시간을 업데이트합니다
 # =========================================
 
-def update_alert_time(alert_type):
-    last_alert_times[alert_type] = time.time()
+def update_alert_time(alert_key):
+    last_alert_times[alert_key] = time.time()
 
 # =========================================
 # EN: Send alerts when system usage is too high
@@ -212,33 +246,70 @@ def update_alert_time(alert_type):
 # KR: 시스템 사용량이 너무 높을 때 알림을 보냅니다
 # =========================================
 
+def send_metric_alert(metric_key, value, status_level):
+    config = METRIC_ALERT_CONFIG[metric_key]
+    label = config["label"]
+    status_message = check_status(value)
+
+    alert_message = f"{label} {status_level} ALERT: {value}% - {status_message}"
+
+    log_alert(alert_message)
+    send_slack_alert(alert_message)
+
+    if config["send_email"]:
+        send_email_alert(
+            config["email_subject"],
+            f"{label} status triggered an alert: {value}% - {status_message}"
+        )
+
+
+def send_recovery_alert(metric_key, value, previous_level):
+    config = METRIC_ALERT_CONFIG[metric_key]
+    label = config["label"]
+
+    recovery_message = (
+        f"{label} RECOVERY: {value}% - "
+        f"Metric returned to OK after previous {previous_level} status."
+    )
+
+    log_alert(recovery_message)
+    send_slack_alert(recovery_message)
+
+    if config["send_email"]:
+        send_email_alert(
+            f"{label} Recovery",
+            recovery_message
+        )
+
+
+def handle_metric_alert(metric_key, value):
+    config = METRIC_ALERT_CONFIG[metric_key]
+    label = config["label"]
+
+    current_level = get_status_level(value)
+    previous_level = last_metric_levels[metric_key]
+
+    if current_level in ["WARNING", "CRITICAL"]:
+        alert_key = f"{metric_key}:{current_level}"
+
+        if can_send_alert(alert_key):
+            send_metric_alert(metric_key, value, current_level)
+            update_alert_time(alert_key)
+        else:
+            log_alert(
+                f"{label} {current_level} alert skipped due to cooldown: {value}%"
+            )
+
+    elif previous_level in ["WARNING", "CRITICAL"] and current_level == "OK":
+        send_recovery_alert(metric_key, value, previous_level)
+
+    last_metric_levels[metric_key] = current_level
+
+
 def handle_alerts(cpu, memory, disk):
-    cpu_status = check_status(cpu)
-    memory_status = check_status(memory)
-    disk_status = check_status(disk)
-
-    if "WARNING" in cpu_status or "CRITICAL" in cpu_status:
-        log_alert(f"CPU: {cpu}% - {cpu_status}")
-        send_slack_alert(f"CPU ALERT: {cpu}% - {cpu_status}")
-        update_alert_time("cpu")
-
-    if "WARNING" in memory_status or "CRITICAL" in memory_status:
-        log_alert(f"Memory: {memory}% - {memory_status}")
-        send_slack_alert(f"MEMORY ALERT: {memory}% - {memory_status}")
-        send_email_alert(
-            "Memory Alert",
-            f"Memory status triggered an alert: {memory}% - {memory_status}"
-        )
-        update_alert_time("memory")
-
-    if "WARNING" in disk_status or "CRITICAL" in disk_status:
-        log_alert(f"Disk: {disk}% - {disk_status}")
-        send_slack_alert(f"DISK ALERT: {disk}% - {disk_status}")
-        send_email_alert(
-            "Disk Alert",
-            f"Disk status triggered an alert: {disk}% - {disk_status}"
-        )
-        update_alert_time("disk")
+    handle_metric_alert("cpu", cpu)
+    handle_metric_alert("memory", memory)
+    handle_metric_alert("disk", disk)
 
 
 # =========================================
@@ -308,9 +379,6 @@ def main():
     try:
         while True:
             clear_terminal()
-
-            print(Fore.CYAN + "System Health Monitor")
-            print("-----------------------------")
 
             display_system_health()
 

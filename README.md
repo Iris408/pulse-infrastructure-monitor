@@ -10,9 +10,15 @@ CPU、メモリ、ディスク使用量、稼働時間を監視するPythonベ�
 
 <img src="./screenshots/system-health-monitor.png" width="500"/>
 
-## Current Status
+## Recent Update
 
-System Health Monitor is a Python monitoring project with Docker support, Slack/email alerts, logging, a FastAPI dashboard, configurable thresholds, and a `/health` endpoint.
+### Alert Cooldown
+
+The monitor includes configurable alert cooldown logic to reduce repeated notifications.
+
+Cooldown is tracked separately for CPU, memory, and disk alerts. Warning and critical alerts are also tracked separately, so a new critical alert can still be sent even if a warning alert was recently triggered.
+
+When a metric returns to an OK state, the monitor sends a recovery message once.
 
 ## Automation / 自動化
 
@@ -45,6 +51,9 @@ System Health Monitor は、設定可能な更新間隔で自動的にシステ�
 | FastAPI web dashboard | FastAPIウェブダッシュボード | ✅ Complete |
 | `/health` JSON endpoint | `/health` JSONエンドポイント | ✅ Complete |
 | Configurable thresholds using environment variables | 環境変数によるしきい値の設定 | ✅ Complete |
+| Configurable alert cooldown | 設定可能なアラートクールダウン | ✅ Complete |
+| Separate cooldown tracking for CPU, memory, and disk | CPU、メモリ、ディスクごとの個別クールダウン管理 | ✅ Complete |
+| Recovery alert when a metric returns to OK | メトリックがOK状態に戻った時の回復アラート | ✅ Complete |
 | EN/JP code comments for learning and review | 学習と復習のための英語/日本語コードコメント | ✅ Complete |
 | GitHub Actions CI | GitHub Actions CI | ✅ Complete |
 
@@ -54,21 +63,19 @@ This project uses GitHub Actions to run automated checks on every push and pull 
 
 Current pipeline:
 
-- Install dependencies
+- Install Python dependencies
 - Validate Python syntax
 - Run tests when available
-- Build project or Docker image where applicable
+- Build the Docker image when a Dockerfile is present
 
 ### Next Roadmap
 
-- Add alert cooldown documentation
 - Add alert history storage
 - Add `/alerts` endpoint
 - Improve dashboard layout
 - Add architecture diagram
-- Add GitHub Actions check
 - Add automated tests
-- Add optional PostgreSQL or SQLite alert storage
+- Add PostgreSQL or SQLite alert storage
 
 ## Planned Features | 追加予定の機能
 
@@ -131,7 +138,8 @@ python3 main.py
 
 ## Docker Usage / Dockerでの起動
 
-This project can run inside a Docker container using Docker compose.
+This project can run inside a Docker container using Docker Compose.
+
 **日本語**:Docker Composeを使用してDockerコンテナ内で実行できます。
 
 Build and run the container/ ビルドして起動:
