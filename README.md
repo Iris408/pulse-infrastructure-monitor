@@ -20,6 +20,7 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 | Alert cooldowns and recovery alerts | ✅ Complete |
 | Structured logging | ✅ Complete |
 | FastAPI `/health` endpoint | ✅ Complete |
+| Prometheus `/metrics` endpoint | ✅ Complete |
 | Docker container support | ✅ Complete |
 | Docker healthcheck | ✅ Complete |
 | GitHub Actions CI/CD health endpoint check | ✅ Complete |
@@ -36,6 +37,7 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 - Structured logs in `logs/system_health.log`
 - Readable health logs in `logs/health_log.txt`
 - FastAPI `/health` endpoint
+- Prometheus-compatible `/metrics` endpoint
 - Docker Compose support
 - GitHub Actions CI/CD pipeline
 
@@ -177,7 +179,8 @@ Example structured log:
 
 ## Next Roadmap
 
-- Add `/metrics` endpoint for Prometheus
+- Add Prometheus scrape configuration
+- Add basic Grafana dashboard after Prometheus is scraping metrics
 - Add alert history storage
 - Add `/alerts` endpoint
 - Add automated tests
