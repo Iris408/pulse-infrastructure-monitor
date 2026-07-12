@@ -21,6 +21,7 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 | Structured logging | ✅ Complete |
 | FastAPI `/health` endpoint | ✅ Complete |
 | Prometheus `/metrics` endpoint | ✅ Complete |
+| Prometheus scrape configuration | ✅ Complete |
 | Docker container support | ✅ Complete |
 | Docker healthcheck | ✅ Complete |
 | GitHub Actions CI/CD health endpoint check | ✅ Complete |
@@ -38,6 +39,7 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 - Readable health logs in `logs/health_log.txt`
 - FastAPI `/health` endpoint
 - Prometheus-compatible `/metrics` endpoint
+- Prometheus scrape configuration with Docker Compose
 - Docker Compose support
 - GitHub Actions CI/CD pipeline
 
@@ -87,6 +89,25 @@ Stop the container:
 
 ```bash
 docker compose down
+```
+## Prometheus
+
+This project includes a Prometheus configuration for scraping the FastAPI `/metrics` endpoint.
+
+Start the app and Prometheus:
+
+```bash
+docker compose up --build
+```
+
+Prometheus UI:
+```text
+http://localhost:9090
+```
+
+Check targets:
+```text
+Status → Targets
 ```
 
 ## CI/CD
@@ -177,17 +198,16 @@ Example structured log:
 - Slack Webhooks
 - SMTP Email
 
+```md id="mwheyd"
 ## Next Roadmap
 
-- Add Prometheus scrape configuration
-- Add basic Grafana dashboard after Prometheus is scraping metrics
+- Add basic Grafana dashboard
 - Add alert history storage
 - Add `/alerts` endpoint
 - Add automated tests
 - Add architecture diagram
 - Add PostgreSQL or SQLite alert storage
-- Add basic Grafana dashboard after Prometheus metrics are working
-
+```
 ## What I Learned
 
 Through this project, I practiced:
