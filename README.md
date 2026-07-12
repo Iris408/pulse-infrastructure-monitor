@@ -2,108 +2,107 @@
 
 # System Health Monitor / システム健全性監視
 
-A Python-based system monitoring application that tracks CPU, memory, disk usage, and uptime with threshold-based alerts, logging, Docker support, and a FastAPI dashboard.
+A Python system monitoring project that tracks CPU, memory, disk usage, and uptime. It includes threshold-based alerts, Slack/email notifications, alert cooldowns, recovery alerts, structured logging, a FastAPI `/health` endpoint, Docker healthchecks, and GitHub Actions CI/CD validation.
 
-CPU、メモリ、ディスク使用量、稼働時間を監視するPythonベースのシステム監視アプリケーションです。しきい値に基づくアラート、ログ記録、Docker対応、FastAPIダッシュボードを備えています。
+CPU、メモリ、ディスク使用量、稼働時間を監視する Python プロジェクトです。しきい値ベースのアラート、Slack/メール通知、アラートクールダウン、回復アラート、構造化ログ、FastAPI `/health` エンドポイント、Docker ヘルスチェック、GitHub Actions CI/CD 検証を含みます。
 
 ## Screenshot / スクリーンショット
 
 <img src="./screenshots/system-health-monitor.png" width="500"/>
 
-## Recent Update
+## Current Status / 現在のステータス
 
-### Alert Cooldown
+| Feature | Status |
+| --- | --- |
+| CPU, memory, disk, and uptime monitoring | ✅ Complete |
+| Warning and critical threshold detection | ✅ Complete |
+| Slack and email alerts | ✅ Complete |
+| Alert cooldowns and recovery alerts | ✅ Complete |
+| Structured logging | ✅ Complete |
+| FastAPI `/health` endpoint | ✅ Complete |
+| Docker container support | ✅ Complete |
+| Docker healthcheck | ✅ Complete |
+| GitHub Actions CI/CD health endpoint check | ✅ Complete |
+| EN/JP comments for learning and review | ✅ Complete |
 
-The monitor includes configurable alert cooldown logic to reduce repeated notifications.
+## Features / 機能
 
-Cooldown is tracked separately for CPU, memory, and disk alerts. Warning and critical alerts are also tracked separately, so a new critical alert can still be sent even if a warning alert was recently triggered.
+- Terminal-based system monitoring
+- CPU, memory, disk, and uptime checks
+- Configurable warning and critical thresholds
+- Slack and email alert support
+- Cooldown logic to prevent repeated alerts
+- Recovery alerts when metrics return to OK
+- Structured logs in `logs/system_health.log`
+- Readable health logs in `logs/health_log.txt`
+- FastAPI `/health` endpoint
+- Docker Compose support
+- GitHub Actions CI/CD pipeline
 
-When a metric returns to an OK state, the monitor sends a recovery message once.
+## Health API
 
-## Automation / 自動化
+Run the FastAPI health API:
 
-System Health Monitor runs automated checks on a configurable refresh interval.
+```bash
+python3 -m uvicorn health_api:app --reload --port 8000
+```
 
-By default, the monitor checks CPU, memory, disk usage, and uptime every 5 minutes.
+Check the health endpoint:
 
-**日本語**:  
-System Health Monitor は、設定可能な更新間隔で自動的にシステム状態を確認します。
+```bash
+curl http://127.0.0.1:8000/health
+```
 
-デフォルトでは、CPU、メモリ、ディスク使用量、稼働時間を5分ごとに監視します。
+Local URLs:
 
-| Setting | Default | Description | 日本語 |
-| --- | --- | --- | --- |
-| `REFRESH_INTERVAL` | `300` | Runs checks every 300 seconds / 5 minutes | 300秒 / 5分ごとに監視を実行 |
-| `WARNING_THRESHOLD` | `75` | Sends a warning when usage is high | 使用率が高い場合に警告 |
-| `CRITICAL_THRESHOLD` | `95` | Sends a critical alert when usage is very high | 使用率が非常に高い場合に重大アラート |
-| `ALERT_COOLDOWN_SECONDS` | `1800` | Prevents repeated alerts from being sent too often | 同じアラートの連続送信を防止 |
+| Page | URL |
+| --- | --- |
+| API Root | http://localhost:8000 |
+| Health Endpoint | http://localhost:8000/health |
+| Swagger UI | http://localhost:8000/docs |
 
-## Features | 機能 
+## Docker Usage
 
-| English | 日本語 | Status |
-| --- | --- | --- |
-| CPU, memory, disk, and uptime monitoring | CPU、メモリ、ディスク、稼働時間の監視 | ✅ Complete |
-| Warning and critical threshold detection | 警告および重大なしきい値の検出 | ✅ Complete |
-| Slack alert integration | Slackアラートとの連携 | ✅ Complete |
-| Email alert integration | メールアラートとの連携 | ✅ Complete |
-| Logging support | ログ記録のサポート | ✅ Complete |
-| Docker container support | Dockerコンテナのサポート | ✅ Complete |
-| FastAPI web dashboard | FastAPIウェブダッシュボード | ✅ Complete |
-| `/health` JSON endpoint | `/health` JSONエンドポイント | ✅ Complete |
-| Configurable thresholds using environment variables | 環境変数によるしきい値の設定 | ✅ Complete |
-| Configurable alert cooldown | 設定可能なアラートクールダウン | ✅ Complete |
-| Separate cooldown tracking for CPU, memory, and disk | CPU、メモリ、ディスクごとの個別クールダウン管理 | ✅ Complete |
-| Recovery alert when a metric returns to OK | メトリックがOK状態に戻った時の回復アラート | ✅ Complete |
-| EN/JP code comments for learning and review | 学習と復習のための英語/日本語コードコメント | ✅ Complete |
-| GitHub Actions CI | GitHub Actions CI | ✅ Complete |
+Build and run:
+
+```bash
+docker compose up --build
+```
+
+Run in the background:
+
+```bash
+docker compose up -d
+```
+
+Check the health endpoint:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Stop the container:
+
+```bash
+docker compose down
+```
 
 ## CI/CD
 
-This project uses GitHub Actions to run automated checks on every push and pull request.
+GitHub Actions runs automated checks on push and pull request.
 
 Current pipeline:
 
 - Install Python dependencies
 - Validate Python syntax
+- Check key module imports
 - Run tests when available
-- Build the Docker image when a Dockerfile is present
+- Build Docker image
+- Start Docker container
+- Call the FastAPI `/health` endpoint
+- Fail if the health endpoint does not respond
 
-### Next Roadmap
-
-- Add alert history storage
-- Add `/alerts` endpoint
-- Improve dashboard layout
-- Add architecture diagram
-- Add automated tests
-- Add PostgreSQL or SQLite alert storage
-
-## Planned Features | 追加予定の機能
-
-- Dashboard UI improvements | ダッシュボードのUI改善 | 🚧 Planned 
-- Add automated tests | 自動テストを追加 | 🚧 Planned 
-- Add historical monitoring charts | 履歴監視チャートを追加 | 🚧 Planned 
-- Add log filtering | ログフィルタリングを追加 | 🚧 Planned 
-- Add deployment documentation | デプロイメントドキュメントを追加 | 🚧 Planned 
-
-## Sample Log Output / サンプルログ出力
-A safe sample monitoring log is available here:
-```text
-examples/health_log.txt
-```
-This sample file is included for demonstration purposes. Real runtime logs are stored locally in the logs/ folder and are excluded from Git.
-
-デモ用の安全な監視ログサンプルは以下に配置しています。
-```text
-examples/health_log.txt
-```
-実行時に生成される実際のログは logs/ フォルダに保存されますが、ローカル環境の情報を含む可能性があるため、Git管理から除外しています。
-
-## Environment Variables / 環境変数
-
-This project uses environment variables for alerting, threshold configuration, and automated refresh timing.
-
-**日本語**:  
-このプロジェクトでは、アラート設定、しきい値設定、自動更新間隔のために環境変数を使用します。
+## Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -120,66 +119,86 @@ REFRESH_INTERVAL=300
 ALERT_COOLDOWN_SECONDS=1800
 ```
 
-# Installation / インストール
+## Installation
 
-Clone the repository/ リポジトリのクローン:
+Clone the repository:
+
 ```bash
 git clone https://github.com/Iris408/system-health-monitor.git
 cd system-health-monitor
 ```
-Install dependencies/ 依存関係のインストール:
+
+Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
-Run the monitor/ 監視スクリプトの実行:
+
+Run the terminal monitor:
+
 ```bash
 python3 main.py
 ```
 
-## Docker Usage / Dockerでの起動
+Run the FastAPI health API:
 
-This project can run inside a Docker container using Docker Compose.
-
-**日本語**:Docker Composeを使用してDockerコンテナ内で実行できます。
-
-Build and run the container/ ビルドして起動:
 ```bash
-docker compose up --build
-```
-Run in the background/ バックグラウンドで起動:
-```bash
-docker compose up -d
-```
-View logs/ ログの確認:
-```bash
-docker compose logs
-```
-Stop the container/ コンテナの停止:
-```bash
-docker compose down
+python3 -m uvicorn health_api:app --reload --port 8000
 ```
 
-## FastAPI Dashboard / FastAPI ダッシュボード
-The project includes a FastAPI dashboard and a /health JSON endpoint for viewing system monitoring data through a browser or API client.
+## Logs
 
-**日本語**:  
-ブラウザやAPIクライアントからシステム監視データを確認できる FastAPI ダッシュボードと `/health` JSON エンドポイントが含まれています。
-
-Local URLs / ローカルURL
-| Page | URL |
+| Log File | Purpose |
 | --- | --- |
-| Dashboard | http://localhost:8000 |
-| Health Endpoint | http://localhost:8000/health |
-| Swagger UI | http://localhost:8000/docs |
+| `logs/health_log.txt` | Readable health check history |
+| `logs/system_health.log` | Structured event log for metrics, alerts, skipped alerts, and recovery events |
 
-## Tech Stack | 技術スタック 
+Example structured log:
+
+```text
+2026-07-12 12:40:10 | INFO | event=metric_check | metric=cpu | value=31.5 | status_level=OK
+2026-07-12 12:40:10 | WARNING | event=alert_sent | metric=memory | value=82.1 | status_level=WARNING | channel=slack
+2026-07-12 13:10:10 | INFO | event=alert_skipped | metric=memory | value=81.4 | status_level=WARNING | reason=cooldown
+```
+
+## Tech Stack
 
 - Python
 - FastAPI
 - Docker
 - Docker Compose
+- GitHub Actions
 - psutil
 - colorama
+- python-dotenv
+- requests
 - Slack Webhooks
 - SMTP Email
-- Git/GitHub
+
+## Next Roadmap
+
+- Add `/metrics` endpoint for Prometheus
+- Add alert history storage
+- Add `/alerts` endpoint
+- Add automated tests
+- Add architecture diagram
+- Add PostgreSQL or SQLite alert storage
+- Add basic Grafana dashboard after Prometheus metrics are working
+
+## What I Learned
+
+Through this project, I practiced:
+
+- Reading system metrics with Python
+- Building a terminal-based monitoring tool
+- Creating threshold-based alerts
+- Sending Slack and email alerts
+- Adding alert cooldown and recovery logic
+- Writing structured logs
+- Creating a FastAPI health endpoint
+- Running the project with Docker Compose
+- Validating the health endpoint through GitHub Actions CI/CD
+
+## Author
+
+Built by Iris408
