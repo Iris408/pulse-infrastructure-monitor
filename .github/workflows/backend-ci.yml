@@ -12,6 +12,19 @@ jobs:
   backend-checks:
     runs-on: ubuntu-latest
 
+    env:
+      SLACK_WEBHOOK_URL: https://example.com/test-webhook
+      EMAIL_HOST: smtp.example.com
+      EMAIL_PORT: 587
+      EMAIL_USER: test@example.com
+      EMAIL_PASSWORD: test-password
+      EMAIL_TO: test@example.com
+      OK_THRESHOLD: 45
+      WARNING_THRESHOLD: 75
+      CRITICAL_THRESHOLD: 95
+      REFRESH_INTERVAL: 300
+      ALERT_COOLDOWN_SECONDS: 1800
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,10 +43,52 @@ jobs:
         run: |
           python -m compileall .
 
+      - name: Check module imports
+        run: |
+          python -c "import logger; print('logger imported successfully')"
+          python -c "import alerts; print('alerts imported successfully')"
+          python -c "import email_alerts; print('email_alerts imported successfully')"
+          python -c "import main; print('main imported successfully')"
+          python -c "import health_api; print('health_api imported successfully')"
+
       - name: Run tests if available
         run: |
-          if [ -d tests ]; then pytest; else echo "No tests folder found"; fi
+          if [ -d tests ]; then
+            python -m pip install pytest
+            pytest
+          else
+            echo "No tests folder found"
+          fi
 
-      - name: Build Docker image if Dockerfile exists
+      - name: Build Docker image
         run: |
-          if [ -f Dockerfile ]; then docker build -t system-health-monitor .; else echo "No Dockerfile found"; fi
+          docker build -t system-health-monitor .
+
+      - name: Run Docker container
+        run: |
+          docker run -d \
+            --name system-health-monitor-test \
+            -p 8000:8000 \
+            system-health-monitor
+
+      - name: Test health endpoint
+        run: |
+          for i in {1..10}; do
+            if curl --fail http://127.0.0.1:8000/health; then
+              echo "Health endpoint is working"
+              exit 0
+            fi
+
+            echo "Waiting for health endpoint..."
+            sleep 3
+          done
+
+          echo "Health endpoint failed"
+          docker logs system-health-monitor-test
+          exit 1
+
+      - name: Stop Docker container
+        if: always()
+        run: |
+          docker stop system-health-monitor-test || true
+          docker rm system-health-monitor-test || true
