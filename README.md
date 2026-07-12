@@ -6,9 +6,15 @@ A Python system monitoring project that tracks CPU, memory, disk usage, and upti
 
 CPU、メモリ、ディスク使用量、稼働時間を監視する Python プロジェクトです。しきい値ベースのアラート、Slack/メール通知、アラートクールダウン、回復アラート、構造化ログ、FastAPI `/health` エンドポイント、Docker ヘルスチェック、GitHub Actions CI/CD 検証を含みます。
 
-## Screenshot / スクリーンショット
+## Screenshots
+
+### Terminal Monitor
 
 <img src="./screenshots/system-health-monitor.png" width="500"/>
+
+### Grafana Dashboard
+
+<img src="./screenshots/grafana-dashboard.png" width="700"/>
 
 ## Current Status / 現在のステータス
 
@@ -20,10 +26,12 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 | Alert cooldowns and recovery alerts | ✅ Complete |
 | Structured logging | ✅ Complete |
 | FastAPI `/health` endpoint | ✅ Complete |
-| Prometheus `/metrics` endpoint | ✅ Complete |
-| Prometheus scrape configuration | ✅ Complete |
 | Docker container support | ✅ Complete |
 | Docker healthcheck | ✅ Complete |
+| Prometheus `/metrics` endpoint | ✅ Complete |
+| Prometheus scrape configuration | ✅ Complete |
+| Grafana service with persistent volume | ✅ Complete |
+| Grafana dashboard panels | ✅ Complete |
 | GitHub Actions CI/CD health endpoint check | ✅ Complete |
 | EN/JP comments for learning and review | ✅ Complete |
 
@@ -40,6 +48,8 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 - FastAPI `/health` endpoint
 - Prometheus-compatible `/metrics` endpoint
 - Prometheus scrape configuration with Docker Compose
+- Grafana service connected to Prometheus
+- Basic Grafana dashboard for CPU, memory, disk, and uptime
 - Docker Compose support
 - GitHub Actions CI/CD pipeline
 
@@ -90,29 +100,22 @@ Stop the container:
 ```bash
 docker compose down
 ```
-## Prometheus
+## Monitoring Stack
 
-This project includes a Prometheus configuration for scraping the FastAPI `/metrics` endpoint.
+This project includes a Docker Compose monitoring stack with:
 
-Start the app and Prometheus:
+- FastAPI `/health` endpoint
+- Prometheus `/metrics` endpoint
+- Prometheus scrape configuration
+- Grafana dashboard panels for CPU, memory, disk, and uptime
 
-```bash
-docker compose up --build
-```
+Full monitoring documentation is available here:
 
-Prometheus UI:
-```text
-http://localhost:9090
-```
-
-Check targets:
-```text
-Status → Targets
-```
+[Monitoring Stack Documentation](./docs/monitoring-stack.md)
 
 ## CI/CD
 
-GitHub Actions runs automated checks on push and pull request.
+A Python system monitoring project that tracks CPU, memory, disk usage, and uptime. It includes structured logging, Slack/email alerts, alert cooldowns, recovery alerts, a FastAPI `/health` endpoint, Prometheus `/metrics` endpoint, Docker healthchecks, Prometheus scraping, Grafana dashboard panels, and GitHub Actions CI/CD validation.
 
 Current pipeline:
 
@@ -124,23 +127,6 @@ Current pipeline:
 - Start Docker container
 - Call the FastAPI `/health` endpoint
 - Fail if the health endpoint does not respond
-
-## Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-SLACK_WEBHOOK_URL=your_slack_webhook_url
-EMAIL_ADDRESS=your_email@example.com
-EMAIL_PASSWORD=your_email_password
-TO_EMAIL=recipient@example.com
-
-OK_THRESHOLD=45
-WARNING_THRESHOLD=75
-CRITICAL_THRESHOLD=95
-REFRESH_INTERVAL=300
-ALERT_COOLDOWN_SECONDS=1800
-```
 
 ## Installation
 
@@ -169,21 +155,6 @@ Run the FastAPI health API:
 python3 -m uvicorn health_api:app --reload --port 8000
 ```
 
-## Logs
-
-| Log File | Purpose |
-| --- | --- |
-| `logs/health_log.txt` | Readable health check history |
-| `logs/system_health.log` | Structured event log for metrics, alerts, skipped alerts, and recovery events |
-
-Example structured log:
-
-```text
-2026-07-12 12:40:10 | INFO | event=metric_check | metric=cpu | value=31.5 | status_level=OK
-2026-07-12 12:40:10 | WARNING | event=alert_sent | metric=memory | value=82.1 | status_level=WARNING | channel=slack
-2026-07-12 13:10:10 | INFO | event=alert_skipped | metric=memory | value=81.4 | status_level=WARNING | reason=cooldown
-```
-
 ## Tech Stack
 
 - Python
@@ -198,29 +169,14 @@ Example structured log:
 - Slack Webhooks
 - SMTP Email
 
-```md id="mwheyd"
-## Next Roadmap
+## Additional Documentation
 
-- Add basic Grafana dashboard
-- Add alert history storage
-- Add `/alerts` endpoint
-- Add automated tests
-- Add architecture diagram
-- Add PostgreSQL or SQLite alert storage
-```
-## What I Learned
+More detailed project documentation is available in the `docs/` folder.
 
-Through this project, I practiced:
-
-- Reading system metrics with Python
-- Building a terminal-based monitoring tool
-- Creating threshold-based alerts
-- Sending Slack and email alerts
-- Adding alert cooldown and recovery logic
-- Writing structured logs
-- Creating a FastAPI health endpoint
-- Running the project with Docker Compose
-- Validating the health endpoint through GitHub Actions CI/CD
+| Document | Description |
+| --- | --- |
+| [Monitoring Stack](./docs/monitoring-stack.md) | Prometheus, Grafana, Docker Compose, and metrics setup |
+| [Project Details](./docs/project-details.md) | Environment variables, logs, learning notes, and development notes |
 
 ## Author
 
