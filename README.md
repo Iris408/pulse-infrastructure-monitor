@@ -10,11 +10,11 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する Python プ
 
 ### Terminal Monitor
 
-<img src="./screenshots/system-health-monitor.png" width="500"/>
+<img src="./screenshots/system-health-monitor.png" width="400"/>
 
 ### Grafana Dashboard
 
-<img src="./screenshots/grafana-dashboard.png" width="700"/>
+<img src="./screenshots/grafana-dashboard.png" width="400"/>
 
 ## Current Status / 現在のステータス
 
