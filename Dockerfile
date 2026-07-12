@@ -33,8 +33,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 
-# EN: Run application
-# JP: アプリ実行
-# KR: 애플리케이션 실행
+# EN: Expose FastAPI port
+# JP: FastAPI のポートを公開
+# KR: FastAPI 포트 공개
 
-CMD ["python", "main.py"]
+EXPOSE 8000
+
+
+# EN: Run the health API service
+# JP: ヘルスチェック API サービスを実行
+# KR: 헬스체크 API 서비스를 실행
+
+CMD ["python", "-m", "uvicorn", "health_api:app", "--host", "0.0.0.0", "--port", "8000"]
