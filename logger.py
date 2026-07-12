@@ -1,32 +1,125 @@
+# EN: Structured logging helpers for System Health Monitor
+# JP: System Health Monitor 用の構造化ログヘルパー
+
 import logging
 import os
 
 
-# EN: Create logs folder if it does not exist
-# JP: logs フォルダが存在しない場合は作成
-# KR: logs 폴더가 없으면 생성
+LOG_DIR = "logs"
+STRUCTURED_LOG_FILE = os.path.join(LOG_DIR, "system_health.log")
 
-os.makedirs("logs", exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
+
+logger = logging.getLogger("system_health_monitor")
+logger.setLevel(logging.INFO)
+
+if not logger.handlers:
+    file_handler = logging.FileHandler(STRUCTURED_LOG_FILE)
+    file_handler.setLevel(logging.INFO)
+
+    formatter = logging.Formatter(
+        "%(asctime)s | %(levelname)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
 
-logging.basicConfig(
-    filename="logs/system_monitor.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+def format_log_fields(**fields):
+    # EN: Convert key-value data into a readable structured log format
+    # JP: キーと値のデータを読みやすい構造化ログ形式に変換します
+
+    formatted_fields = []
+
+    for key, value in fields.items():
+        if value is not None:
+            formatted_fields.append(f"{key}={value}")
+
+    return " | ".join(formatted_fields)
 
 
-# EN: Log normal monitoring status
-# JP: 通常の監視ステータスをログに記録
-# KR: 일반 모니터링 상태를 로그에 기록
+def log_event(level, event_name, **fields):
+    # EN: Write one structured event to the log file
+    # JP: 1つの構造化イベントをログファイルに書き込みます
+
+    message = f"event={event_name}"
+
+    formatted_fields = format_log_fields(**fields)
+
+    if formatted_fields:
+        message = f"{message} | {formatted_fields}"
+
+    if level == "warning":
+        logger.warning(message)
+
+    elif level == "error":
+        logger.error(message)
+
+    else:
+        logger.info(message)
+
+
+def log_metric_status(metric, value, status_level, status_message):
+    log_event(
+        "info",
+        "metric_check",
+        metric=metric,
+        value=value,
+        status_level=status_level,
+        status_message=status_message,
+    )
+
+
+def log_alert_sent(metric, value, status_level, channel):
+    log_event(
+        "warning",
+        "alert_sent",
+        metric=metric,
+        value=value,
+        status_level=status_level,
+        channel=channel,
+    )
+
+
+def log_alert_skipped(metric, value, status_level, reason):
+    log_event(
+        "info",
+        "alert_skipped",
+        metric=metric,
+        value=value,
+        status_level=status_level,
+        reason=reason,
+    )
+
+
+def log_recovery_sent(metric, value, previous_level):
+    log_event(
+        "info",
+        "recovery_alert_sent",
+        metric=metric,
+        value=value,
+        previous_level=previous_level,
+        status_level="OK",
+    )
+
+
+# =========================================
+# EN: Backwards-compatible helper functions
+# JP: 既存コードとの互換性を保つためのヘルパー関数
+# =========================================
 
 def log_status(message):
-    logging.info(message)
+    log_event(
+        "info",
+        "status",
+        message=message,
+    )
 
-
-# EN: Log warning or critical alerts
-# JP: 警告または重大アラートをログに記録
-# KR: 경고 또는 심각 알림을 로그에 기록
 
 def log_alert(message):
-    logging.warning(message)
+    log_event(
+        "warning",
+        "alert",
+        message=message,
+    )

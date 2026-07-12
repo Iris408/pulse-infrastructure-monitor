@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from alerts import send_slack_alert
 from email_alerts import send_email_alert
-from logger import log_status, log_alert
+from logger import (log_metric_status, log_alert_sent, log_alert_skipped, log_recovery_sent)
 
 
 # =========================================
@@ -253,13 +253,33 @@ def send_metric_alert(metric_key, value, status_level):
 
     alert_message = f"{label} {status_level} ALERT: {value}% - {status_message}"
 
-    log_alert(alert_message)
+    log_alert_sent(
+        metric=metric_key,
+        value=value,
+        status_level=status_level,
+        channel="log",
+    )
+
     send_slack_alert(alert_message)
+
+    log_alert_sent(
+        metric=metric_key,
+        value=value,
+        status_level=status_level,
+        channel="slack",
+    )
 
     if config["send_email"]:
         send_email_alert(
             config["email_subject"],
             f"{label} status triggered an alert: {value}% - {status_message}"
+        )
+
+        log_alert_sent(
+            metric=metric_key,
+            value=value,
+            status_level=status_level,
+            channel="email",
         )
 
 
@@ -272,7 +292,12 @@ def send_recovery_alert(metric_key, value, previous_level):
         f"Metric returned to OK after previous {previous_level} status."
     )
 
-    log_alert(recovery_message)
+    log_recovery_sent(
+        metric=metric_key,
+        value=value,
+        previous_level=previous_level,
+    )
+
     send_slack_alert(recovery_message)
 
     if config["send_email"]:
@@ -296,8 +321,11 @@ def handle_metric_alert(metric_key, value):
             send_metric_alert(metric_key, value, current_level)
             update_alert_time(alert_key)
         else:
-            log_alert(
-                f"{label} {current_level} alert skipped due to cooldown: {value}%"
+            log_alert_skipped(
+                metric=metric_key,
+                value=value,
+                status_level=current_level,
+                reason="cooldown",
             )
 
     elif previous_level in ["WARNING", "CRITICAL"] and current_level == "OK":
@@ -336,9 +364,26 @@ def display_system_health():
 
     print(f"System Uptime: {uptime} hours")
 
-    log_status(f"CPU: {cpu}% - {check_status(cpu)}")
-    log_status(f"Memory: {memory}% - {check_status(memory)}")
-    log_status(f"Disk: {disk}% - {check_status(disk)}")
+    log_metric_status(
+        metric="cpu",
+        value=cpu,
+        status_level=get_status_level(cpu),
+        status_message=check_status(cpu),
+    )
+
+    log_metric_status(
+        metric="memory",
+        value=memory,
+        status_level=get_status_level(memory),
+        status_message=check_status(memory),
+    )
+
+    log_metric_status(
+        metric="disk",
+        value=disk,
+        status_level=get_status_level(disk),
+        status_message=check_status(disk),
+    )
 
     handle_alerts(cpu, memory, disk)
 
