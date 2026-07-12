@@ -14,12 +14,26 @@ from main import (
     check_status,
 )
 
+from fastapi.responses import Response
+from prometheus_client import CONTENT_TYPE_LATEST, Gauge, generate_latest
 
 app = FastAPI(
     title="System Health Monitor API",
     description="Healthcheck API for monitoring CPU, memory, disk, and uptime.",
     version="2.0.0",
 )
+
+cpu_gauge = Gauge("system_cpu_usage_percent", "CPU usage percentage")
+memory_gauge = Gauge("system_memory_usage_percent", "Memory usage percentage")
+disk_gauge = Gauge("system_disk_usage_percent", "Disk usage percentage")
+uptime_gauge = Gauge("system_uptime_hours", "System uptime in hours")
+
+
+def update_prometheus_metrics():
+    cpu_gauge.set(get_cpu_usage())
+    memory_gauge.set(get_memory_usage())
+    disk_gauge.set(get_disk_usage())
+    uptime_gauge.set(get_system_uptime())
 
 
 def format_metric_health(name, value):
@@ -88,3 +102,12 @@ def health_check():
             "disk": format_metric_health("disk", disk),
         },
     }
+
+@app.get("/metrics")
+def prometheus_metrics():
+    update_prometheus_metrics()
+
+    return Response(
+        generate_latest(),
+        media_type=CONTENT_TYPE_LATEST,
+    )
