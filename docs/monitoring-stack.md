@@ -14,11 +14,14 @@ The stack includes:
 
 ## Services
 
-| Service | URL | Purpose |
-| --- | --- | --- |
-| System Health Monitor API | http://localhost:8000 | FastAPI health and metrics API |
-| Prometheus | http://localhost:9090 | Scrapes `/metrics` from the monitor service |
-| Grafana | http://localhost:3000 | Visualizes Prometheus metrics |
+| Service | URL |
+| --- | --- |
+| API Root | `http://localhost:8000` |
+| Health Endpoint | `http://localhost:8000/health` |
+| Metrics Endpoint | `http://localhost:8000/metrics` |
+| Swagger UI | `http://localhost:8000/docs` |
+| Prometheus | `http://localhost:9090` |
+| Grafana | `http://localhost:3000` |
 
 ---
 

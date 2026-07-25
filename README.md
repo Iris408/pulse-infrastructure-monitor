@@ -2,21 +2,23 @@
 
 # System Health Monitor / システム健全性監視
 
-A Python system monitoring project that tracks CPU, memory, disk usage, and uptime. It includes threshold-based alerts, Slack/email notifications, alert cooldowns, recovery alerts, structured logging, a FastAPI `/health` endpoint, Docker healthchecks, and GitHub Actions CI/CD validation.
+A production-style Python monitoring project for tracking CPU, memory, disk usage, and uptime. It includes FastAPI health and metrics endpoints, threshold-based alerts, structured logging, Docker Compose, Prometheus, Grafana, and GitHub Actions CI/CD.
 
-CPU、メモリ、ディスク使用量、稼働時間を監視する Python プロジェクトです。しきい値ベースのアラート、Slack/メール通知、アラートクールダウン、回復アラート、構造化ログ、FastAPI `/health` エンドポイント、Docker ヘルスチェック、GitHub Actions CI/CD 検証を含みます。
+CPU、メモリ、ディスク使用量、稼働時間を監視する、本番環境を意識したPythonプロジェクトです。FastAPIのヘルス・メトリクスエンドポイント、しきい値アラート、構造化ログ、Docker Compose、Prometheus、Grafana、GitHub Actions CI/CDを含みます。
 
 ## Screenshots
 
 ### Terminal Monitor
 
-<img src="./screenshots/system-health-monitor.png" width="400"/>
+<img src="./screenshots/system-health-monitor.png" width="300"/>
 
 ### Grafana Dashboard
 
-<img src="./screenshots/grafana-dashboard.png" width="400"/>
+<img src="./screenshots/grafana-dashboard.png" width="300"/>
 
 ## Current Status / 現在のステータス
+
+The core monitoring and observability stack is complete. Future development will focus on testing, alerting improvements, deployment, and production configuration.
 
 | Feature | Status |
 | --- | --- |
@@ -100,33 +102,24 @@ Stop the container:
 ```bash
 docker compose down
 ```
+
 ## Monitoring Stack
 
-This project includes a Docker Compose monitoring stack with:
+The Docker Compose monitoring stack includes:
 
-- FastAPI `/health` endpoint
-- Prometheus `/metrics` endpoint
-- Prometheus scrape configuration
-- Grafana dashboard panels for CPU, memory, disk, and uptime
+- FastAPI application with `/health` and `/metrics` endpoints
+- Prometheus metric collection and scrape configuration
+- Grafana connected to Prometheus
+- Dashboard panels for CPU, memory, disk usage, and uptime
+- Persistent Grafana storage
 
-Full monitoring documentation is available here:
+Detailed setup and configuration:
 
 [Monitoring Stack Documentation](./docs/monitoring-stack.md)
 
 ## CI/CD
 
-A Python system monitoring project that tracks CPU, memory, disk usage, and uptime. It includes structured logging, Slack/email alerts, alert cooldowns, recovery alerts, a FastAPI `/health` endpoint, Prometheus `/metrics` endpoint, Docker healthchecks, Prometheus scraping, Grafana dashboard panels, and GitHub Actions CI/CD validation.
-
-Current pipeline:
-
-- Install Python dependencies
-- Validate Python syntax
-- Check key module imports
-- Run tests when available
-- Build Docker image
-- Start Docker container
-- Call the FastAPI `/health` endpoint
-- Fail if the health endpoint does not respond
+GitHub Actions validates the Python application and Docker deployment on every push and pull request.
 
 ## Installation
 
@@ -155,14 +148,43 @@ Run the FastAPI health API:
 python3 -m uvicorn health_api:app --reload --port 8000
 ```
 
+## Project Structure
+
+```text
+system-health-monitor/
+├── docs/
+│   ├── monitoring-stack.md
+│   └── project-details.md
+├── screenshots/
+│   ├── grafana-dashboard.png
+│   ├── screenshot.png
+│   └── system-health-monitor.png
+├── examples/
+│   ├── health_log.txt
+├── alerts.py
+├── dashboard.py
+├── email_alerts.py
+├── .env.example
+├── health_api.py
+├── logger.py
+├── main.py
+├── prometheus.yml
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
+```
+
 ## Tech Stack
 
 - Python
 - FastAPI
+- psutil
+- Prometheus
+- Grafana
 - Docker
 - Docker Compose
 - GitHub Actions
-- psutil
 - colorama
 - python-dotenv
 - requests
