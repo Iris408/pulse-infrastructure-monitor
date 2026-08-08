@@ -1,16 +1,16 @@
-# EN: Structured logging helpers for System Health Monitor
-# JP: System Health Monitor 用の構造化ログヘルパー
+# EN: Structured logging helpers for Infrastructure Health Monitoring Platform
+# JP: Infrastructure Health Monitoring Platform 用の構造化ログヘルパー
 
 import logging
 import os
 
 
 LOG_DIR = "logs"
-STRUCTURED_LOG_FILE = os.path.join(LOG_DIR, "system_health.log")
+STRUCTURED_LOG_FILE = os.path.join(LOG_DIR, "pulse.log")
 
 os.makedirs(LOG_DIR, exist_ok=True)
 
-logger = logging.getLogger("system_health_monitor")
+logger = logging.getLogger("pulse_monitor")
 logger.setLevel(logging.INFO)
 
 if not logger.handlers:
