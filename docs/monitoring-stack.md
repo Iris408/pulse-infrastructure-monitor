@@ -1,6 +1,6 @@
 # Monitoring Stack
 
-This document explains the monitoring stack used by the System Health Monitor project.
+This document explains the monitoring stack used by the Infrastructure Health Monitoring Platform.
 
 The stack includes:
 
@@ -79,7 +79,7 @@ Status → Targets
 Expected result:
 
 ```text
-system-health-monitor UP
+pulse-monitor UP
 ```
 
 Example queries:
@@ -123,7 +123,7 @@ http://prometheus:9090
 Dashboard name:
 
 ```text
-System Health Monitor Dashboard
+Pulse Infrastructure Overview
 ```
 
 Current panels:

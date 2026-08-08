@@ -1,5 +1,5 @@
-# EN: FastAPI health endpoint for the System Health Monitor
-# JP: System Health Monitor 用の FastAPI ヘルスチェックエンドポイント
+# EN: FastAPI health endpoint for the Infrastructure Health Monitoring Platform
+# JP: Infrastructure Health Monitoring Platform 用の FastAPI ヘルスチェックエンドポイント
 
 from datetime import datetime
 
@@ -18,9 +18,9 @@ from fastapi.responses import Response
 from prometheus_client import CONTENT_TYPE_LATEST, Gauge, generate_latest
 
 app = FastAPI(
-    title="System Health Monitor API",
+    title="Pulse Monitor",
     description="Healthcheck API for monitoring CPU, memory, disk, and uptime.",
-    version="2.0.0",
+    version="2.3.2",
 )
 
 cpu_gauge = Gauge("system_cpu_usage_percent", "CPU usage percentage")
@@ -53,8 +53,8 @@ def format_metric_health(name, value):
 @app.get("/")
 def root():
     return {
-        "service": "system-health-monitor",
-        "message": "System Health Monitor API is running.",
+        "service": "pulse-monitor",
+        "message": "Pulse Monitor is running.",
         "health_endpoint": "/health",
     }
 
@@ -92,7 +92,7 @@ def health_check():
         overall_status = "ok"
 
     return {
-        "service": "system-health-monitor",
+        "service": "pulse-monitor",
         "status": overall_status,
         "checked_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "uptime_hours": uptime,

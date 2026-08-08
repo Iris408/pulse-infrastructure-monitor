@@ -1,6 +1,6 @@
 # Project Details
 
-This document contains extra setup, logging, environment, and learning notes for the System Health Monitor project.
+This document contains extra setup, logging, environment, and learning notes for the Infrastructure Health Monitoring Platform.
 
 ---
 
@@ -90,7 +90,7 @@ Through this project, I practiced:
 
 ## Development Notes
 
-This project started as a beginner Python monitoring script and has been expanded into a more production-style monitoring project.
+This project started as a beginner Python monitoring script and has been expanded into a production-style monitoring platform.
 
 Current production-style additions include:
 

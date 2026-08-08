@@ -354,7 +354,7 @@ def display_system_health():
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    print("\nSystem Health Monitor")
+    print("\nPulse Monitor")
     print("-----------------------------")
     print(f"Checked At: {current_time}")
 
@@ -430,7 +430,7 @@ def main():
             time.sleep(REFRESH_INTERVAL)
 
     except KeyboardInterrupt:
-        print("\nSystem Health Monitor stopped.")
+        print("\nPulse Monitor stopped.")
 
 
 if __name__ == "__main__":

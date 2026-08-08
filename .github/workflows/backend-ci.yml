@@ -62,14 +62,14 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t system-health-monitor .
+          docker build -t pulse .
 
       - name: Run Docker container
         run: |
           docker run -d \
-            --name system-health-monitor-test \
+            --name pulse-test \
             -p 8000:8000 \
-            system-health-monitor
+            pulse
 
       - name: Test health endpoint
         run: |
@@ -84,11 +84,11 @@ jobs:
           done
 
           echo "Health endpoint failed"
-          docker logs system-health-monitor-test
+          docker logs pulse-test
           exit 1
 
       - name: Stop Docker container
         if: always()
         run: |
-          docker stop system-health-monitor-test || true
-          docker rm system-health-monitor-test || true
+          docker stop pulse-test || true
+          docker rm pulse-test || true

@@ -54,11 +54,11 @@ def dashboard():
     html = f"""
     <html>
         <head>
-            <title>System Health Monitor</title>
+            <title>Pulse</title>
         </head>
 
         <body>
-            <h1>System Health Monitor</h1>
+            <h1>Infrastructure Health Monitoring Platform</h1>
 
             <h2>Current Metrics</h2>
 

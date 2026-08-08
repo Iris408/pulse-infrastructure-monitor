@@ -1,11 +1,32 @@
-![Backend CI](https://github.com/Iris408/system-health-monitor/actions/workflows/backend-ci.yml/badge.svg)
+![Backend CI](https://github.com/Iris408/pulse-infrastructure-monitor/actions/workflows/backend-ci.yml/badge.svg)
 
-# System Health Monitor / システム健全性監視
+# Pulse
 
-A production-style Python monitoring project for tracking CPU, memory, disk usage, and uptime. It includes FastAPI health and metrics endpoints, threshold-based alerts, structured logging, Docker Compose, Prometheus, Grafana, and GitHub Actions CI/CD.
+Infrastructure Health Monitoring Platform
 
-CPU、メモリ、ディスク使用量、稼働時間を監視する、本番環境を意識したPythonプロジェクトです。FastAPIのヘルス・メトリクスエンドポイント、しきい値アラート、構造化ログ、Docker Compose、Prometheus、Grafana、GitHub Actions CI/CDを含みます。
+Pulse is a containerised monitoring platform built with Python, FastAPI, Prometheus and Grafana. It exposes system-health metrics, provides operational dashboards and supports configurable monitoring and alerting workflows.
 
+## Overview
+## Key Features
+## Technology Stack
+
+- Python
+- FastAPI
+- psutil
+- Prometheus
+- Grafana
+- Docker
+- Docker Compose
+- GitHub Actions
+- colorama
+- python-dotenv
+- requests
+- Slack Webhooks
+- SMTP Email
+
+## Architecture
+## Quick Start
+## Monitoring Endpoints
 ## Screenshots
 
 ### Terminal Monitor
@@ -15,6 +36,13 @@ CPU、メモリ、ディスク使用量、稼働時間を監視する、本番�
 ### Grafana Dashboard
 
 <img src="./screenshots/grafana-dashboard.png" width="300"/>
+
+## Testing and CI
+## Documentation
+## Roadmap
+
+
+
 
 ## Current Status / 現在のステータス
 
@@ -126,8 +154,8 @@ GitHub Actions validates the Python application and Docker deployment on every p
 Clone the repository:
 
 ```bash
-git clone https://github.com/Iris408/system-health-monitor.git
-cd system-health-monitor
+git clone https://github.com/Iris408/pulse-infrastructure-monitor.git
+cd pulse-infrastructure-monitor
 ```
 
 Install dependencies:
@@ -151,7 +179,7 @@ python3 -m uvicorn health_api:app --reload --port 8000
 ## Project Structure
 
 ```text
-system-health-monitor/
+pulse-infrastructure-monitor/
 ├── docs/
 │   ├── monitoring-stack.md
 │   └── project-details.md
@@ -175,21 +203,7 @@ system-health-monitor/
 └── README.md
 ```
 
-## Tech Stack
 
-- Python
-- FastAPI
-- psutil
-- Prometheus
-- Grafana
-- Docker
-- Docker Compose
-- GitHub Actions
-- colorama
-- python-dotenv
-- requests
-- Slack Webhooks
-- SMTP Email
 
 ## Additional Documentation
 
