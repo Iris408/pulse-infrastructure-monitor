@@ -45,7 +45,7 @@ jobs:
 
       - name: Check module imports
         run: |
-          python -c "import logger; print('logger imported successfully')"
+          python -c "import app.logging.logger; print('logger imported successfully')"
           python -c "import alerts; print('alerts imported successfully')"
           python -c "import email_alerts; print('email_alerts imported successfully')"
           python -c "import main; print('main imported successfully')"

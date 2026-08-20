@@ -22,11 +22,13 @@ Pulse is a containerised infrastructure monitoring platform built with Python, F
 
 ## Current Status
 
-**Current release: v2.3.1** ✅
+**Current release: v2.3.2** ✅
 
-The core monitoring and observability stack is complete and portfolio-ready. Pulse currently provides system resource monitoring, configurable alerting, FastAPI health/metrics endpoints, Prometheus collection, Grafana visualization, structured logging, Docker Compose deployment, and CI.
+The core monitoring and observability stack is complete and portfolio-ready.
 
-The next phase will focus on automated testing, alert reliability, and production-style configuration.
+v2.3.2 introduces a modular application structure, separating Pulse into dedicated API, monitoring, alerting, logging, and dashboard components. The refactor improves maintainability and prepares the project for expanded automated testing, alert reliability improvements, and production-style configuration.
+
+Pulse currently provides system resource monitoring, configurable alerting, FastAPI health and metrics endpoints, Prometheus collection, Grafana visualisation, structured logging, Docker Compose deployment, and backend CI.
 
 See the [Roadmap](./docs/roadmap.md) for detailed release history and planned work.
 
