@@ -10,13 +10,15 @@ The Docker Compose environment provides the complete monitoring stack:
 - Prometheus
 - Grafana
 
+Pulse v2.3.2 uses a modular Python application structure, with application code organised under `app/` and monitoring configuration stored under `config/`.
+
 ---
 
 ## Prerequisites
 
 For local Python development:
 
-- Python 3
+- Python 3.11+
 - pip
 - Git
 
@@ -48,11 +50,7 @@ Update the values required for your environment.
 
 The `.env` file may contain sensitive information and should not be committed to Git.
 
-See:
-
-[Configuration Documentation](./configuration.md)
-
-for detailed configuration information.
+See [Configuration Documentation](./configuration.md) for detailed configuration information.
 
 ---
 
@@ -61,7 +59,7 @@ for detailed configuration information.
 ## Create a Virtual Environment
 
 ```bash
-python3 -m venv .venv
+python -m venv .venv
 ```
 
 Activate it on macOS/Linux:
@@ -83,16 +81,21 @@ pip install -r requirements.txt
 
 ## Run the Terminal Monitor
 
+From the repository root:
+
 ```bash
-python3 main.py
+python -m app.main
 ```
+> **Python command note:** Depending on your operating system and Python installation, the Python command may be `python` or `python3`. If a command using `python` is not recognised, try the equivalent command with `python3`.
 
 ---
 
 ## Run the FastAPI Application
 
+From the repository root:
+
 ```bash
-python3 -m uvicorn health_api:app --reload --port 8000
+python -m uvicorn app.api.health:app --reload --port 8000
 ```
 
 The API is then available locally.
@@ -123,6 +126,26 @@ http://localhost:8000/docs
 
 ---
 
+## Run Automated Tests
+
+Pulse uses pytest for backend testing.
+
+Run the test suite from the repository root:
+
+```bash
+pytest
+```
+
+Pytest configuration is stored in:
+
+```text
+pytest.ini
+```
+
+The current test suite includes FastAPI health and metrics endpoint checks.
+
+---
+
 # Docker Setup
 
 For the complete Pulse monitoring environment:
@@ -143,6 +166,8 @@ Check service status:
 docker compose ps
 ```
 
+The Pulse API container should report as healthy once its health check succeeds.
+
 ---
 
 ## Verify Pulse
@@ -153,7 +178,7 @@ Check application health:
 curl http://localhost:8000/health
 ```
 
-Check Prometheus metrics:
+Check Prometheus-compatible metrics:
 
 ```bash
 curl http://localhost:8000/metrics
@@ -169,7 +194,24 @@ Prometheus is available at:
 http://localhost:9090
 ```
 
-Confirm that the Pulse target is being scraped successfully.
+The Prometheus configuration is stored at:
+
+```text
+config/prometheus.yml
+```
+
+Docker Compose mounts this configuration into the Prometheus container.
+
+Confirm that the Pulse target is being scraped successfully and reports as `UP`.
+
+Pulse currently exposes:
+
+```text
+system_cpu_usage_percent
+system_memory_usage_percent
+system_disk_usage_percent
+system_uptime_hours
+```
 
 ---
 
@@ -181,13 +223,50 @@ Grafana is available at:
 http://localhost:3000
 ```
 
-Grafana uses Prometheus as the monitoring data source.
+Grafana uses Prometheus as the monitoring data source and provides dashboard visualisation for:
 
-See:
+- CPU usage
+- Memory usage
+- Disk usage
+- System uptime
 
-[Grafana Dashboard Documentation](./grafana-dashboard.md)
+See [Grafana Dashboard Documentation](./grafana-dashboard.md) for additional dashboard information.
 
-for additional information.
+### Grafana Persistent Data
+
+Grafana data is persisted using the Docker Compose volume:
+
+```text
+grafana_data
+```
+
+This allows Grafana configuration and dashboard data to survive normal container restarts.
+
+Running:
+
+```bash
+docker compose down
+```
+
+preserves this volume.
+
+Running:
+
+```bash
+docker compose down -v
+```
+
+removes Compose-managed volumes and may remove persisted Grafana configuration.
+
+If the Grafana data is reset, the Prometheus data source and Pulse dashboard may need to be recreated or re-imported.
+
+When Grafana and Prometheus are running through Docker Compose, the Prometheus data source should use the internal service address:
+
+```text
+http://prometheus:9090
+```
+
+rather than `localhost:9090`.
 
 ---
 
@@ -219,6 +298,12 @@ Use this carefully because persisted Grafana configuration may be removed.
 
 Before committing changes, perform the checks relevant to the change.
 
+Run the backend tests:
+
+```bash
+pytest
+```
+
 Validate Docker Compose:
 
 ```bash
@@ -243,13 +328,50 @@ Review container status:
 docker compose ps
 ```
 
+For monitoring-stack changes, also confirm:
+
+- Pulse reports as healthy
+- Prometheus reports the Pulse target as `UP`
+- Grafana can query Prometheus
+- CPU, memory, disk, and uptime panels receive data
+
+---
+
+# Current Application Paths
+
+Pulse v2.3.2 introduced a modular application structure.
+
+Key paths include:
+
+```text
+app/main.py
+app/api/health.py
+app/monitoring/
+app/alerts/
+app/logging/
+app/dashboard/
+config/prometheus.yml
+tests/
+pytest.ini
+```
+
+Older commands referencing root-level modules such as `main.py` or `health_api.py` no longer apply after the v2.3.2 refactor.
+
 ---
 
 # Common Problems
 
-If Pulse, Prometheus, Grafana, alerts, or metrics are not working as expected, see:
+If Pulse, Prometheus, Grafana, alerts, or metrics are not working as expected, see [Troubleshooting](./troubleshooting.md).
 
-[Troubleshooting](./troubleshooting.md)
+Common areas to check include:
+
+- Python module paths
+- Environment configuration
+- Docker container health
+- Prometheus target status
+- Grafana data source configuration
+- Port conflicts
+- Alert credentials
 
 ---
 
