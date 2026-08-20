@@ -48,8 +48,8 @@ jobs:
           python -c "import app.logging.logger; print('logger imported successfully')"
           python -c "import alerts; print('alerts imported successfully')"
           python -c "import email_alerts; print('email_alerts imported successfully')"
-          python -c "import main; print('main imported successfully')"
-          python -c "import health_api; print('health_api imported successfully')"
+          python -c "import app.main; print('main imported successfully')"
+          python -c "import app.api.health; print('health_api imported successfully')"
 
       - name: Run tests if available
         run: |
