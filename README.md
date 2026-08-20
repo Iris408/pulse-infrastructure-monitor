@@ -1,8 +1,8 @@
 ![Backend CI](https://github.com/Iris408/pulse-infrastructure-monitor/actions/workflows/backend-ci.yml/badge.svg)
 
-# Pulse
+# 💓 Pulse
 
-**Infrastructure Health Monitoring Platform**
+### Infrastructure Health Monitoring Platform
 
 Pulse is a containerised infrastructure monitoring platform built with Python, FastAPI, Prometheus, and Grafana. It monitors system health, exposes operational metrics, provides Grafana dashboards, and supports configurable Slack and email alerting.
 
@@ -11,13 +11,24 @@ Pulse is a containerised infrastructure monitoring platform built with Python, F
 - CPU, memory, disk, and uptime monitoring
 - Configurable warning and critical thresholds
 - FastAPI `/health` and `/metrics` endpoints
-- Prometheus metric collection
+- Prometheus-compatible metrics
 - Grafana infrastructure dashboard
 - Slack and email notifications
 - Alert cooldowns and recovery notifications
 - Structured application logging
-- Docker and Docker Compose deployment
-- GitHub Actions CI
+- Containerised deployment with Docker Compose
+- GitHub Actions backend CI
+
+
+## Current Status
+
+**Current release: v2.3.1** ✅
+
+The core monitoring and observability stack is complete and portfolio-ready. Pulse currently provides system resource monitoring, configurable alerting, FastAPI health/metrics endpoints, Prometheus collection, Grafana visualization, structured logging, Docker Compose deployment, and CI.
+
+The next phase will focus on automated testing, alert reliability, and production-style configuration.
+
+See the [Roadmap](./docs/roadmap.md) for detailed release history and planned work.
 
 ## Technology Stack
 
@@ -27,7 +38,7 @@ Pulse is a containerised infrastructure monitoring platform built with Python, F
 | Observability | Prometheus, Grafana |
 | Alerting | Slack Webhooks, SMTP Email |
 | Infrastructure | Docker, Docker Compose |
-| CI/CD | GitHub Actions |
+| CI/CD | GitHub Actions (Backend CI) |
 | Configuration | python-dotenv |
 | Utilities | requests, colorama |
 
@@ -39,20 +50,24 @@ System Resources
        ▼
   Pulse Monitor
        │
-       ├──────────► Logging
+       ├──────────► Structured Logging
        │
        ├──────────► Slack / Email Alerts
        │
        ▼
-   FastAPI
+    FastAPI
  /health  /metrics
-             │
-             ▼
-        Prometheus
-             │
-             ▼
-          Grafana
+       ▲
+       │ scrapes
+       │
+   Prometheus
+       │
+       │ queries
+       ▼
+    Grafana
 ```
+
+Prometheus periodically scrapes metrics exposed by Pulse, while Grafana queries Prometheus to provide visual monitoring of CPU, memory, disk usage, and system uptime.
 
 For a more in-depth breakdown of the system design, please see the [Architecture Documentation](./docs/architecture.md).
 
@@ -60,11 +75,11 @@ For a more in-depth breakdown of the system design, please see the [Architecture
 
 ### Terminal Monitor
 
-<img src="./screenshots/system-health-monitor.png" width="500" alt="Pulse terminal system monitor">
+<img src="./screenshots/system-health-monitor.png" width="600" alt="Pulse terminal system monitor">
 
 ### Grafana Dashboard
 
-<img src="./screenshots/grafana-dashboard.png" width="700" alt="Pulse Grafana infrastructure dashboard">
+<img src="./screenshots/grafana-dashboard.png" width="600" alt="Pulse Grafana infrastructure dashboard">
 
 ## Quick Start
 
@@ -83,7 +98,7 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Create your environment configuration:
+Create the environment configuration:
 
 ```bash
 cp .env.example .env
@@ -94,8 +109,7 @@ Run the terminal monitor:
 ```bash
 python3 main.py
 ```
-
-Or start the FastAPI service:
+**Or start the FastAPI service:**
 
 ```bash
 python3 -m uvicorn health_api:app --reload --port 8000
@@ -136,70 +150,32 @@ When running locally:
 | Prometheus | `http://localhost:9090` |
 | Grafana | `http://localhost:3000` |
 
-## Monitoring Stack
-
-Pulse uses a containerised observability stack:
-
-```text
-Pulse
-  │
-  │ /metrics
-  ▼
-Prometheus
-  │
-  ▼
-Grafana
-```
-
-Prometheus periodically checks metrics exposed by Pulse, while Grafana queries Prometheus to provide visual monitoring of CPU, memory, disk usage, and system uptime.
-
-## Current Status
-
-**Current release: v2.3.1**
-
-The core monitoring and observability stack is complete.
-
-| Capability | Status |
-| --- | :---: |
-| System resource monitoring | ✅ |
-| Warning and critical thresholds | ✅ |
-| Slack and email alerting | ✅ |
-| Cooldowns and recovery alerts | ✅ |
-| Structured logging | ✅ |
-| FastAPI health API | ✅ |
-| Prometheus metrics | ✅ |
-| Grafana dashboards | ✅ |
-| Docker Compose stack | ✅ |
-| GitHub Actions CI | ✅ |
-
-The next development phase will focus on alerting improvements, followed by automated testing and production configuration.
-
 ## Testing and CI
 
-GitHub Actions automatically validates the application on pushes and pull requests to `main`.
+GitHub Actions automatically validates the Python backend on pushes and pull requests to `main`.
 
-The CI workflow provides automated checks for the Python application and Docker-based monitoring environment.
+The current CI workflow runs automated backend checks to help catch regressions before changes are merged.
 
-Additional automated testing is planned as part of the next development phases.
+Additional automated testing and Docker validation are planned as part of the next development phase.
 
 ## Project Structure
 
 ```text
 pulse-infrastructure-monitor/
+├── app/
+│   ├── api/
+│   ├── monitoring/
+│   ├── alerts/
+│   ├── logging/
+│   └── dashboard/
+├── tests/
+├── config/
 ├── docs/
 ├── screenshots/
 ├── examples/
-├── alerts.py
-├── dashboard.py
-├── email_alerts.py
-├── health_api.py
-├── logger.py
-├── main.py
-├── prometheus.yml
-├── docker-compose.yml
+├── .github/workflows/
 ├── Dockerfile
-├── requirements.txt
-├── .env.example
+├── docker-compose.yml
 └── README.md
 ```
 
@@ -209,33 +185,21 @@ Detailed engineering documentation is available in [`docs/`](./docs/).
 
 | Document | Description |
 | --- | --- |
-| [Architecture](./docs/architecture.md) | System architecture and component responsibilities |
 | [Alerting](./docs/alerting.md) | Slack, email, thresholds, cooldowns, and recovery alerts |
+| [Architecture](./docs/architecture.md) | System architecture and component responsibilities |
 | [Configuration](./docs/configuration.md) | Environment variables and application configuration |
 | [Grafana Dashboard](./docs/grafana-dashboard.md) | Dashboard setup, metrics, and panels |
+| [Learning Notes](./docs/learning-notes.md) | Technical lessons and engineering decisions |
 | [Logging](./docs/logging.md) | Logging architecture and operational logs |
 | [Monitoring Stack](./docs/monitoring-stack.md) | FastAPI, Prometheus, Grafana, and Docker integration |
+| [Project Details](./docs/project-details.md) | Additional implementation details |
+| [Roadmap](./docs/roadmap.md) | Current release and future development |
 | [Setup](./docs/setup.md) | Local and Docker installation |
 | [Troubleshooting](./docs/troubleshooting.md) | Common problems and diagnostic steps |
-| [Roadmap](./docs/roadmap.md) | Current release and future development |
-| [Learning Notes](./docs/learning-notes.md) | Technical lessons and engineering decisions |
-| [Project Details](./docs/project-details.md) | Additional implementation details |
 
-## Roadmap
 
-### Current
-
-**v2.3.1 — Grafana Dashboard** ✅
-
-### Next
-
-**v2.3.2 — Alerting Improvements**
-
-Planned areas include structured alerts, improved severity handling, alert metadata, and incident identification.
-
-Future development will introduce automated testing, production configuration improvements, and expanded monitoring capabilities.
-
-See the full [Pulse Roadmap](./docs/roadmap.md).
+## License
+This project is licensed under the terms in [MIT LICENSE](./LICENSE) file for details.
 
 ## Author
 

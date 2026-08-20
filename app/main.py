@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from alerts import send_slack_alert
 from email_alerts import send_email_alert
-from logger import (log_metric_status, log_alert_sent, log_alert_skipped, log_recovery_sent)
+from app.logging.logger import (log_metric_status, log_alert_sent, log_alert_skipped, log_recovery_sent)
 
 
 # =========================================
