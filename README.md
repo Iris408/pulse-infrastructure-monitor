@@ -19,18 +19,20 @@ Pulse is a containerised infrastructure monitoring platform built with Python, F
 - Containerised deployment with Docker Compose
 - GitHub Actions backend CI
 
-
 ## Current Status
 
-**Current release: v2.3.2** ✅
+**Current release: v2.3.2** ✅  
+**Lifecycle: Maintenance**
 
-The core monitoring and observability stack is complete and portfolio-ready.
+The core Pulse monitoring and observability stack is complete and portfolio-ready.
 
-v2.3.2 introduces a modular application structure, separating Pulse into dedicated API, monitoring, alerting, logging, and dashboard components. The refactor improves maintainability and prepares the project for expanded automated testing, alert reliability improvements, and production-style configuration.
+Pulse provides system resource monitoring, configurable Slack and email alerting, FastAPI health and metrics endpoints, Prometheus metric collection, Grafana visualisation, structured logging, Docker Compose deployment, and GitHub Actions CI.
 
-Pulse currently provides system resource monitoring, configurable alerting, FastAPI health and metrics endpoints, Prometheus collection, Grafana visualisation, structured logging, Docker Compose deployment, and backend CI.
+v2.3.2 introduced a modular application structure separating the API, monitoring, alerting, logging, and dashboard components to improve maintainability.
 
-See the [Roadmap](./docs/roadmap.md) for detailed release history and planned work.
+Future work is limited to maintenance, automated testing, dependency and security updates, alert reliability, documentation, and infrastructure improvements.
+
+See the [Roadmap](./docs/roadmap.md) for release history and maintenance work.
 
 ## Technology Stack
 
@@ -40,7 +42,7 @@ See the [Roadmap](./docs/roadmap.md) for detailed release history and planned wo
 | Observability | Prometheus, Grafana |
 | Alerting | Slack Webhooks, SMTP Email |
 | Infrastructure | Docker, Docker Compose |
-| CI/CD | GitHub Actions (Backend CI) |
+| CI | GitHub Actions (Backend CI) |
 | Configuration | python-dotenv |
 | Utilities | requests, colorama |
 
@@ -158,7 +160,7 @@ GitHub Actions automatically validates the Python backend on pushes and pull req
 
 The current CI workflow runs automated backend checks to help catch regressions before changes are merged.
 
-Additional automated testing and Docker validation are planned as part of the next development phase.
+Additional automated testing, security checks, and Docker validation are tracked as maintenance improvements.
 
 ## Project Structure
 

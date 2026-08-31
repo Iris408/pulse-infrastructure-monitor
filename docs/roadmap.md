@@ -2,9 +2,9 @@
 
 ## Overview
 
-Pulse is being developed incrementally from a lightweight Python system monitor into a production-style infrastructure monitoring and observability platform.
+Pulse is a production-style infrastructure monitoring and observability project built with Python, FastAPI, Prometheus, Grafana, and Docker.
 
-The roadmap prioritises monitoring, observability, alerting, testing, deployment, reliability, and maintainability.
+The core monitoring platform is complete. Pulse is now moving into maintenance, with future work focused on reliability, testing, security, dependency management, documentation, and small operational improvements rather than continued feature expansion.
 
 ---
 
@@ -12,11 +12,12 @@ The roadmap prioritises monitoring, observability, alerting, testing, deployment
 
 ### v2.3.2 — Modular Architecture Refactor
 
-**Status: Complete**
+**Status: Complete**  
+**Lifecycle: Maintenance**
 
-Pulse has been reorganised from a simple Python application structure into a modular package architecture.
+v2.3.2 reorganised Pulse into a modular application architecture, completing the current planned feature cycle.
 
-This release focuses on maintainability, separation of concerns, and preparing the application for its final testing and production-hardening phases.
+The refactor improved separation of concerns across monitoring, API, alerting, logging, and dashboard functionality while preserving the existing monitoring and observability behaviour.
 
 ### Completed
 
@@ -29,18 +30,22 @@ This release focuses on maintainability, separation of concerns, and preparing t
 - Moved Prometheus configuration into `config/`
 - Updated internal Python imports
 - Updated FastAPI application paths
-- Updated Docker configuration for the modular application structure
+- Updated Docker configuration
 - Updated Docker Compose configuration paths
-- Updated backend CI imports for the new package structure
+- Updated backend CI for the modular structure
 - Preserved existing monitoring and observability behaviour
 - Updated repository documentation and project structure
 
-### Current Platform Capabilities
+---
+
+## Current Platform Capabilities
+
+Pulse currently provides:
 
 - CPU monitoring
 - Memory monitoring
 - Disk monitoring
-- System uptime
+- System uptime monitoring
 - Warning and critical thresholds
 - Slack alerts
 - Email alerts
@@ -60,13 +65,13 @@ This release focuses on maintainability, separation of concerns, and preparing t
 
 ---
 
-## Previous Release
+## Release History
 
 ### v2.3.1 — Grafana Dashboard
 
 **Status: Complete**
 
-Introduced the initial Grafana infrastructure dashboard connected to the existing Prometheus monitoring stack.
+Introduced the initial Grafana infrastructure dashboard connected to the Prometheus monitoring stack.
 
 Completed dashboard panels:
 
@@ -77,141 +82,124 @@ Completed dashboard panels:
 
 This release completed the core Pulse monitoring and observability stack.
 
+### v2.3.2 — Modular Architecture Refactor
+
+**Status: Complete**
+
+Reorganised Pulse into dedicated application modules for:
+
+- API
+- Monitoring
+- Alerting
+- Logging
+- Dashboard integration
+
+This established a cleaner architecture for long-term maintenance and testing.
+
 ---
 
-## v2.3.3 — Alerting Improvements
+## Maintenance Roadmap
 
-**Status: Planned**
+Future Pulse development is intentionally limited to maintenance and reliability work.
 
-### Focus
+### Testing
 
-Improve the structure, consistency, reliability, and maintainability of operational alerts.
+Planned improvements include:
 
-Potential work includes:
+- Health endpoint tests
+- Metrics endpoint tests
+- System metric collection tests
+- Threshold evaluation tests
+- Warning and critical behaviour tests
+- Alert behaviour tests
+- Alert cooldown tests
+- Recovery notification tests
+- Configuration tests
+- API response tests
 
-- Structured alert representation
+Testing should prioritise behaviour that could cause incorrect monitoring or alerting rather than implementation details.
+
+### Alert Reliability
+
+Maintenance work may include:
+
 - Consistent alert formatting
-- Severity classification
 - Improved alert metadata
-- Incident identifiers
-- Improved operational logging
 - Alert failure handling
 - Cooldown reliability
 - Recovery notification reliability
+- Operational logging improvements
 
-Implementation details will be finalised during development rather than treated as fixed requirements.
+These are reliability improvements rather than a new alerting feature cycle.
 
----
+### CI and Security
 
-## v2.4.0 — Testing
+Planned maintenance improvements may include:
 
-**Status: Planned**
+- Docker validation in CI
+- Dependency review
+- Automated security analysis
+- Dependency updates
+- Python version maintenance
+- Workflow updates
 
-Introduce broader automated testing for core Pulse behaviour.
+### Configuration and Infrastructure
 
-### Areas to Cover
-
-- Health endpoint
-- Metrics endpoint
-- System metric collection
-- Threshold evaluation
-- Warning behaviour
-- Critical behaviour
-- Alert behaviour
-- Alert cooldowns
-- Recovery behaviour
-- Configuration
-- API responses
-
-Testing should prioritise behaviour that could cause incorrect monitoring or alerting rather than testing implementation details.
-
----
-
-## v2.5.0 — Production Configuration
-
-**Status: Planned**
-
-Improve deployment, runtime configuration, and operational reliability before Pulse moves primarily into maintenance.
-
-### Potential Work
+Maintenance work may include:
 
 - Configuration validation
-- Improved secret handling
+- Secret-handling improvements
 - Logging configuration
-- Environment-specific configuration
 - Docker improvements
-- Docker validation in CI
 - Container health checks
 - Failure handling
 - Deployment documentation
-- Final operational review
+
+### Documentation
+
+Documentation will be maintained alongside technical changes, including:
+
+- Setup instructions
+- Architecture documentation
+- Monitoring configuration
+- Alert configuration
+- Troubleshooting guidance
+- Release notes
 
 ---
 
-## Stable / Maintenance Phase
+## Deliberately Out of Scope
 
-After the v2.5.0 production-hardening work is complete, Pulse will move primarily into maintenance.
+The following capabilities are not part of the current Pulse roadmap:
 
-Development during this phase will focus on:
-
-- Bug fixes
-- Dependency updates
-- Security updates
-- Monitoring reliability
-- Documentation maintenance
-- Small operational improvements
-- Portfolio maintenance
-
-Large new features will generally be deferred to the v3.0.0 roadmap.
-
----
-
-## Future Development
-
-Longer-term areas of exploration include:
-
-- Alert history
-- Incident tracking
+- Multi-host monitoring
+- Centralised host management
+- Incident management platform
+- Alert history platform
 - Additional notification providers
 - Network monitoring
-- Container monitoring
-- Historical analysis
-- Multi-host monitoring
-- Cloud deployment
-- Expanded Grafana dashboards
+- Container orchestration monitoring
+- Historical analytics platform
+- Cloud monitoring platform
+- Large-scale distributed monitoring
 
-These features are exploratory and are not required before Pulse enters maintenance.
+These would significantly expand the scope of Pulse and are not required for the project to demonstrate infrastructure monitoring and observability engineering.
 
----
-
-## v3.0.0 — Multi-Host Monitoring
-
-**Status: Future**
-
-The long-term direction for Pulse is to move beyond monitoring a single environment and explore centralised infrastructure monitoring.
-
-Potential capabilities include:
-
-- Multiple monitored hosts
-- Host identification
-- Centralised metrics
-- Host-specific dashboards
-- Service availability monitoring
-- Centralised alert management
-
-The scope of v3.0.0 will be defined after the current monitoring platform is stable and there is a clear engineering reason to expand beyond single-environment monitoring.
+If a future engineering requirement provides a clear reason to revisit one of these areas, it will be evaluated as a separate major release rather than remaining permanently on the active backlog.
 
 ---
 
-## Development Principles
+## Maintenance Principles
 
-Future Pulse development will continue to prioritise:
+Pulse maintenance prioritises:
 
 1. Reliability
 2. Observability
 3. Maintainability
 4. Testability
-5. Clear documentation
-6. Incremental development
+5. Security
+6. Clear documentation
 
-New features should solve a clear monitoring or operational problem rather than being added solely to increase the scope of the project.
+New features should only be considered when they solve a clear monitoring or operational problem.
+
+The objective is to keep Pulse stable, understandable, demonstrable, and maintainable rather than continually increasing its scope.

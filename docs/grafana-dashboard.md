@@ -2,46 +2,54 @@
 
 ## Overview
 
-Pulse uses Grafana to provide a visual representation of system health metrics collected by Prometheus.
+Pulse uses Grafana to provide a visual representation of infrastructure health metrics collected by Prometheus.
 
-The dashboard transforms raw infrastructure metrics into easy-to-understand visualisations, allowing developers and operators to monitor application health at a glance.
+The dashboard transforms raw monitoring metrics into clear visualisations, providing an at-a-glance view of CPU usage, memory usage, disk usage, and system uptime.
 
-Grafana is connected directly to Prometheus, which continuously pulls performance metrics from the Pulse FastAPI app.
+Grafana uses Prometheus as its data source, while Prometheus collects metrics exposed through the Pulse FastAPI `/metrics` endpoint.
 
 ---
 
 ## Dashboard Architecture
 
 ```text
-Pulse Monitor
-      │
-      ▼
- /metrics Endpoint
-      │
-      ▼
- Prometheus
-      │
-      ▼
- Grafana
-      │
-      ▼
- Infrastructure Dashboard
+Pulse
+  │
+  ▼
+FastAPI /metrics
+  │
+  │ scrape
+  ▼
+Prometheus
+  │
+  │ query
+  ▼
+Grafana
+  │
+  ▼
+Infrastructure Dashboard
 ```
+
+This separates metric collection from visualisation:
+
+- Pulse collects and exposes system metrics.
+- Prometheus scrapes and stores the metrics.
+- Grafana queries Prometheus and presents the data through dashboard panels.
 
 ---
 
 ## Dashboard Panels
 
-The current dashboard provides four core infrastructure metrics.
+The current Pulse dashboard provides four core infrastructure metrics.
 
 | Panel | Description |
-|---------|-------------|
+| --- | --- |
 | CPU Usage | Current processor utilisation |
-| Memory Usage | Current system memory consumption |
+| Memory Usage | Current system memory utilisation |
 | Disk Usage | Current disk utilisation |
-| System Uptime | Total application uptime |
+| System Uptime | Current system uptime |
 
-These panels provide a quick overview of the monitored system's health.
+Together, these panels provide a concise overview of the monitored system's resource usage and availability.
 
 ---
 
@@ -49,195 +57,238 @@ These panels provide a quick overview of the monitored system's health.
 
 The CPU panel displays current processor utilisation as a percentage.
 
-This metric helps identify:
+This provides visibility into:
 
-- High system load
-- CPU-intensive workloads
-- Resource bottlenecks
+- Current system load
+- High CPU utilisation
+- Resource pressure
 
-Typical thresholds:
+Example monitoring thresholds:
 
 | Status | Usage |
-|---------|------:|
+| --- | ---: |
 | Normal | Below 80% |
 | Warning | 80–89% |
 | Critical | 90% and above |
+
+Actual alert thresholds are controlled through Pulse configuration.
 
 ---
 
 ## Memory Usage
 
-The memory panel displays current RAM utilisation.
+The memory panel displays current system memory utilisation.
 
-Monitoring memory usage helps identify:
+Monitoring memory usage provides visibility into:
 
+- Current memory consumption
 - Memory pressure
-- Potential leaks
-- Resource exhaustion
+- Potential resource exhaustion
 
-Typical thresholds:
+Example monitoring thresholds:
 
 | Status | Usage |
-|---------|------:|
+| --- | ---: |
 | Normal | Below 80% |
 | Warning | 80–89% |
 | Critical | 90% and above |
+
+Actual alert thresholds are controlled through Pulse configuration.
 
 ---
 
 ## Disk Usage
 
-The disk panel displays storage utilisation.
+The disk panel displays current disk utilisation.
 
-Monitoring disk capacity helps prevent:
+Monitoring disk usage provides visibility into:
 
-- Full disks
-- Application failures
-- Logging interruptions
+- Current storage utilisation
+- Low available disk capacity
+- Potential resource constraints
 
-Typical thresholds:
+Example monitoring thresholds:
 
 | Status | Usage |
-|---------|------:|
+| --- | ---: |
 | Normal | Below 85% |
 | Warning | 85–94% |
 | Critical | 95% and above |
+
+Actual alert thresholds are controlled through Pulse configuration.
 
 ---
 
 ## System Uptime
 
-The uptime panel shows how long the monitoring application has been running.
+The uptime panel displays system uptime.
 
-This metric provides visibility into:
-
-- Service stability
-- Unexpected restarts
-- Deployment verification
-
-A continuously increasing uptime generally indicates stable operation.
+This metric provides additional operational context when monitoring the environment and can help identify unexpected system restarts.
 
 ---
 
 ## Data Source
 
-Grafana retrieves all monitoring data from Prometheus.
+Grafana retrieves Pulse monitoring data from Prometheus.
 
-Default data source:
-
-```text
-Prometheus
-```
-
-Default connection:
+The Prometheus data source is available within the Docker Compose network at:
 
 ```text
 http://prometheus:9090
 ```
 
+This uses the Docker Compose service name rather than `localhost`, allowing the Grafana container to communicate directly with the Prometheus container.
+
 ---
 
 ## Metric Collection
 
-Pulse exposes metrics in a format Prometheus can read, via the `/metrics` endpoint on the FastAPI app.
+Pulse exposes Prometheus-compatible metrics through the FastAPI:
 
-Prometheus checks this endpoint at regular intervals and stores the data it collects.
+```text
+/metrics
+```
 
-Grafana then queries Prometheus to display that data as visualisations.
+The monitoring flow is:
+
+```text
+System Resources
+       │
+       ▼
+     Pulse
+       │
+       ▼
+FastAPI /metrics
+       │
+       │ scraped by
+       ▼
+   Prometheus
+       │
+       │ queried by
+       ▼
+     Grafana
+```
+
+Prometheus periodically scrapes the endpoint and stores the resulting metric data.
+
+Grafana queries Prometheus to populate the infrastructure dashboard.
 
 ---
 
 ## Dashboard Persistence
 
-Grafana dashboards are stored using a persistent Docker volume.
+Grafana uses persistent Docker storage.
 
-This ensures that:
+This allows Grafana configuration and dashboard state to remain available across container restarts.
 
-- Dashboards remain available after container restarts
-- Data source configuration is retained
-- Dashboard customisations are preserved
+Persistent storage helps retain:
+
+- Dashboard configuration
+- Data source configuration
+- Dashboard customisations
+
+The persistent volume is managed through the Pulse Docker Compose configuration.
 
 ---
 
 ## Accessing Grafana
 
-When running with Docker Compose, Grafana is available at:
+When running the complete monitoring stack with Docker Compose, Grafana is available locally at:
 
 ```text
 http://localhost:3000
 ```
 
-Default credentials:
+If the local development environment uses the default Grafana credentials:
 
 ```text
 Username: admin
 Password: admin
 ```
 
-> Change the default password after the initial login when using Pulse outside of local development.
+Default credentials should only be used for local development and should be changed before using the stack in a less restricted environment.
 
 ---
 
-## Dashboard Screenshots
+## Dashboard Screenshot
 
-Example dashboard:
+A screenshot of the current Pulse Grafana dashboard is stored at:
 
 ```text
 screenshots/grafana-dashboard.png
 ```
 
-The dashboard currently includes panels for:
+The dashboard includes panels for:
 
-- CPU Usage
-- Memory Usage
-- Disk Usage
-- System Uptime
+- CPU usage
+- Memory usage
+- Disk usage
+- System uptime
+
+This screenshot is also used to demonstrate the observability layer within the repository and portfolio.
 
 ---
 
-## Future Dashboard Enhancements
+## Current Dashboard Scope
 
-Future releases will expand the Grafana dashboard with additional operational insights.
+The current Grafana dashboard is intentionally focused on the four core metrics exposed by Pulse:
 
-Planned improvements include:
+```text
+CPU
+Memory
+Disk
+Uptime
+```
 
-- Network traffic monitoring
-- Container health panels
-- Alert status overview
-- Service availability indicators
-- Historical trend analysis
-- Dashboard variables and filtering
-- Dark/light dashboard themes
-- Multi-host monitoring
-- Incident timeline visualisation
+This dashboard represents the completed Grafana scope for the current Pulse monitoring platform.
+
+The objective is to provide a clear infrastructure overview without expanding the project into a larger monitoring or incident-management product.
+
+---
+
+## Maintenance
+
+Future Grafana work is limited primarily to maintaining and improving the existing dashboard.
+
+Maintenance may include:
+
+- Fixing broken queries or panels
+- Updating dashboard configuration
+- Improving panel readability
+- Maintaining Prometheus compatibility
+- Updating Grafana versions
+- Reviewing persistent storage configuration
+- Updating screenshots and documentation
+- Small visual or operational improvements
+
+Additional monitoring domains such as multi-host monitoring, container orchestration monitoring, incident timelines, and large-scale infrastructure dashboards are outside the current Pulse scope.
 
 ---
 
 ## Design Principles
 
-The dashboard has been designed around several key principles.
-
 ### Simplicity
 
-Present the most important infrastructure metrics without unnecessary complexity.
+The dashboard focuses on the core infrastructure metrics required to understand the monitored system's current health.
 
 ### Readability
 
-Use clear visualisations that allow issues to be identified quickly.
+Panels should present monitoring information clearly and make abnormal resource usage easy to identify.
 
 ### Operational Awareness
 
-Provide an immediate overview of overall system health.
+The dashboard complements Pulse's health endpoint, structured logs, and alerting system by providing a visual view of infrastructure metrics.
 
-### Extensibility
+### Maintainability
 
-Allow new metrics and dashboard panels to be added as Pulse continues to evolve.
+Dashboard configuration should remain straightforward to run, understand, and maintain alongside the existing Prometheus monitoring stack.
 
 ---
 
 ## Related Documentation
 
-- [Monitoring Stack](./monitoring-stack.md)
 - [Architecture](./architecture.md)
+- [Monitoring Stack](./monitoring-stack.md)
 - [Alerting](./alerting.md)
 - [Configuration](./configuration.md)
+- [Roadmap](./roadmap.md)

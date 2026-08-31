@@ -2,24 +2,25 @@
 
 ## Overview
 
-Pulse is a containerised infrastructure health monitoring platform built with Python, FastAPI, Prometheus, and Grafana.
+Pulse is a containerised infrastructure health monitoring and observability platform built with Python, FastAPI, Prometheus, and Grafana.
 
-The platform continuously monitors system resources, exposes health and metrics endpoints, provides operational dashboards, and supports alerting through Slack and email.
+The platform monitors system resources, exposes health and Prometheus-compatible metrics endpoints, provides operational dashboards, and supports alerting through Slack and email.
 
-The architecture is intentionally modular, allowing monitoring, logging, alerting, metrics collection, and visualisation to evolve independently while remaining easy to understand and maintain.
+Pulse uses a modular application structure that separates API, monitoring, alerting, logging, and dashboard responsibilities. This keeps the system easier to understand, test, and maintain as the project moves into maintenance.
 
 ---
 
 ## Architecture Goals
 
-Pulse has been designed around the following principles:
+Pulse is designed around the following principles:
 
-- Separation of responsibilities
-- Modular services
-- Production-style project structure
-- Containerised deployment
-- Extensible monitoring and alerting
-- Simple deployment using Docker Compose
+- Separation of concerns
+- Modular application components
+- Clear component responsibilities
+- Containerised infrastructure
+- Observable application behaviour
+- Maintainable monitoring and alerting
+- Simple local deployment with Docker Compose
 
 ---
 
@@ -27,144 +28,277 @@ Pulse has been designed around the following principles:
 
 ```text
                     ┌──────────────────────┐
-                    │    System Resources  │
+                    │   System Resources   │
                     │ CPU • Memory • Disk  │
-                    │ Uptime • Processes   │
+                    │       Uptime         │
                     └──────────┬───────────┘
                                │
                                ▼
-                      ┌─────────────────┐
-                      │   Pulse Monitor │
-                      │    (main.py)    │
-                      └────────┬────────┘
+                    ┌─────────────────────┐
+                    │   Pulse Monitoring  │
+                    │   app/monitoring/   │
+                    └──────────┬──────────┘
                                │
-        ┌──────────────┬───────────────┬──────────────┐
-        ▼              ▼               ▼              ▼
-   logger.py      alerts.py      dashboard.py   health_api.py
-        │              │                              │
-        │              │                              ▼
-        │              │                      FastAPI Endpoints
-        │              │                    /health • /metrics
-        │              │                              │
-        ▼              ▼                              ▼
-   Log Files     Slack / Email                 Prometheus
-                                                  │
-                                                  ▼
-                                              Grafana
+              ┌────────────────┼────────────────┐
+              │                │                │
+              ▼                ▼                ▼
+       app/logging/      app/alerts/       app/api/
+              │                │                │
+              ▼                ▼                ▼
+        Structured       Slack / Email      FastAPI
+           Logs                            /health
+                                           /metrics
+                                              │
+                                              │ scrape
+                                              ▼
+                                         Prometheus
+                                              │
+                                              │ query
+                                              ▼
+                                           Grafana
 ```
+
+The monitoring layer collects system resource information and coordinates the operational behaviour of Pulse.
+
+Logging and alerting handle monitoring events and notifications, while the FastAPI layer exposes application health and metrics for external monitoring.
+
+Prometheus scrapes the metrics endpoint and stores time-series metric data. Grafana queries Prometheus to provide visual infrastructure dashboards.
+
+---
+
+## Application Structure
+
+The v2.3.2 refactor introduced a modular Python application structure.
+
+```text
+app/
+├── api/
+├── monitoring/
+├── alerts/
+├── logging/
+└── dashboard/
+```
+
+Each package is responsible for a specific part of the monitoring platform.
 
 ---
 
 ## Component Responsibilities
 
-### main.py
+### `app/api/`
 
-The main monitoring service.
+Provides the HTTP interface for Pulse.
+
+Current API functionality includes:
+
+- Application root endpoint
+- Health endpoint
+- Prometheus-compatible metrics endpoint
+
+Important endpoints include:
+
+```text
+/
+/health
+/metrics
+```
+
+The API allows external systems such as Docker and Prometheus to inspect application health and collect operational metrics.
+
+---
+
+### `app/monitoring/`
+
+Contains the core system-monitoring behaviour.
 
 Responsibilities include:
 
-- Collecting system metrics
-- Evaluating warning and critical thresholds
-- Coordinating logging
-- Triggering alerts
-- Updating the monitoring dashboard
+- Collecting CPU usage
+- Collecting memory usage
+- Collecting disk usage
+- Tracking system uptime
+- Evaluating configured thresholds
+- Coordinating monitoring behaviour
 
-This acts as the orchestration layer for the application.
-
----
-
-### health_api.py
-
-Provides HTTP endpoints for external monitoring tools.
-
-Current endpoints include:
-
-- `/`
-- `/health`
-- `/metrics`
-
-These endpoints allow Docker, Prometheus, and external services to verify application health and collect metrics.
+This package represents the core monitoring domain of Pulse.
 
 ---
 
-### logger.py
+### `app/alerts/`
 
-Responsible for structured logging.
+Contains notification and alert behaviour.
 
-Logs operational information including:
+Current responsibilities include:
 
-- System health
-- Alerts
+- Slack notifications
+- Email notifications
+- Warning and critical alert behaviour
+- Alert cooldown handling
+- Recovery notifications
+
+Keeping notification behaviour separate from metric collection makes the alerting system easier to maintain and test independently.
+
+---
+
+### `app/logging/`
+
+Handles operational and structured logging.
+
+Logged activity can include:
+
+- Metric checks
 - Threshold events
-- Monitoring activity
+- Alerts sent
+- Alerts skipped because of cooldown behaviour
+- Recovery events
 
-Logs are written to the project's log files for later review.
-
----
-
-### alerts.py
-
-Handles notification delivery.
-
-Current integrations include:
-
-- Slack
-- Email
-
-Alert cooldown logic prevents duplicate notifications during sustained incidents.
+Structured logging provides an operational history that can be used when reviewing monitoring behaviour or troubleshooting problems.
 
 ---
 
-### dashboard.py
+### `app/dashboard/`
 
-Displays the local terminal monitoring dashboard.
+Contains dashboard-related application components.
 
-Provides a real-time view of:
+Pulse provides local monitoring output alongside its Grafana visualisation layer.
+
+The dashboard components support visibility into:
 
 - CPU usage
 - Memory usage
 - Disk usage
-- Uptime
-- Overall application status
+- System uptime
+- Overall monitoring status
+
+Grafana remains the primary visual observability interface for Prometheus metric data.
 
 ---
 
 ## Monitoring Flow
 
-The monitoring process follows a simple continuous workflow.
+The core monitoring workflow can be represented as:
 
 ```text
-Collect Metrics
+Collect System Metrics
         │
         ▼
 Evaluate Thresholds
         │
-        ▼
-Generate Alerts
+        ├──────────────► Write Structured Logs
         │
-        ▼
-Write Logs
+        ├──────────────► Trigger Alerts
         │
         ▼
 Expose Metrics
         │
         ▼
-Visualise in Grafana
+Prometheus Scraping
+        │
+        ▼
+Grafana Visualisation
 ```
+
+This separates system monitoring from the external observability layer while allowing both to work from the same application behaviour.
+
+---
+
+## Observability Flow
+
+Pulse exposes Prometheus-compatible metrics through FastAPI.
+
+```text
+Pulse
+  │
+  │ /metrics
+  ▼
+Prometheus
+  │
+  │ PromQL queries
+  ▼
+Grafana
+```
+
+Prometheus periodically scrapes the Pulse metrics endpoint.
+
+Grafana uses Prometheus as its data source and provides dashboard panels for:
+
+- CPU usage
+- Memory usage
+- Disk usage
+- System uptime
+
+This provides a separate observability layer from the terminal monitoring interface.
+
+---
+
+## Alerting Flow
+
+Alerting operates alongside the monitoring workflow.
+
+```text
+System Metric
+     │
+     ▼
+Threshold Evaluation
+     │
+     ├── Healthy ─────────► Continue Monitoring
+     │
+     ├── Warning ─────────► Alert Logic
+     │
+     └── Critical ────────► Alert Logic
+                               │
+                     ┌─────────┴─────────┐
+                     ▼                   ▼
+                   Slack               Email
+                     │                   │
+                     └─────────┬─────────┘
+                               ▼
+                       Structured Logging
+```
+
+Cooldown behaviour helps prevent repeated notifications during sustained conditions.
+
+Recovery notifications can be generated when a monitored metric returns to a healthy state.
 
 ---
 
 ## Docker Architecture
 
-Pulse is deployed using Docker Compose.
+Pulse uses Docker Compose to run the monitoring and observability stack.
 
-The monitoring stack consists of three primary services.
+The primary services are:
 
 | Service | Purpose |
-|----------|---------|
-| Pulse Monitor | Collects metrics and exposes APIs |
-| Prometheus | Scrapes and stores metrics |
-| Grafana | Visualises operational dashboards |
+| --- | --- |
+| Pulse | Runs the monitoring application and FastAPI interface |
+| Prometheus | Scrapes and stores operational metrics |
+| Grafana | Queries Prometheus and visualises monitoring data |
+
+The service relationship is:
+
+```text
+┌─────────────────┐
+│      Pulse      │
+│    FastAPI      │
+│     :8000       │
+└────────┬────────┘
+         │
+         │ scrape /metrics
+         ▼
+┌─────────────────┐
+│   Prometheus    │
+│      :9090      │
+└────────┬────────┘
+         │
+         │ query
+         ▼
+┌─────────────────┐
+│     Grafana     │
+│      :3000      │
+└─────────────────┘
+```
+
+Docker Compose provides a repeatable way to run the complete monitoring stack locally.
 
 ---
 
@@ -174,67 +308,97 @@ The monitoring stack consists of three primary services.
 
 - Python
 - FastAPI
-
-### Monitoring
-
 - psutil
+
+### Observability
+
 - Prometheus
 - Grafana
+
+### Alerting
+
+- Slack Incoming Webhooks
+- SMTP Email
 
 ### Infrastructure
 
 - Docker
 - Docker Compose
+
+### CI
+
 - GitHub Actions
 
-### Notifications
+### Configuration
 
-- Slack Webhooks
-- SMTP Email
+- Environment variables
+- python-dotenv
 
 ---
 
 ## Design Principles
 
-Pulse follows several engineering principles throughout the project.
-
 ### Separation of Concerns
 
-Each module has a single responsibility.
+Monitoring, API, alerting, logging, and dashboard responsibilities are separated into dedicated application packages.
 
-Examples include monitoring, logging, alerting, and API endpoints.
+This reduces coupling and makes individual parts of the system easier to understand and maintain.
 
----
+### Observability
 
-### Extensibility
+Pulse exposes operational information through multiple layers:
 
-New monitoring capabilities can be added without major architectural changes.
+- Structured logs
+- Health endpoint
+- Prometheus metrics
+- Grafana dashboards
+- Slack and email notifications
 
-Examples include:
-
-- Additional system metrics
-- New alert providers
-- Database-backed alert history
-- Incident management
-
----
+Together, these provide visibility into both the monitored system and Pulse's monitoring behaviour.
 
 ### Maintainability
 
-The project favours readable code, modular components, and concise documentation to simplify future development.
+The project favours modular components, explicit configuration, containerised infrastructure, and focused documentation.
+
+The v2.3.2 architecture refactor established the current structure for long-term maintenance.
+
+### Reliability
+
+Monitoring and alerting behaviour should remain predictable and testable.
+
+Future maintenance therefore prioritises regression testing, alert reliability, configuration validation, and infrastructure checks over adding additional platform features.
 
 ---
 
-## Future Architecture
+## Maintenance Architecture
 
-Future versions will expand the architecture with:
+The current architecture represents the completed feature scope for Pulse.
 
-- Structured alert models
-- Incident IDs
-- Alert history
-- Multiple notification providers
-- Deployment configuration improvements
-- Additional monitoring targets
-- Expanded automated testing
+Future architectural work should primarily support:
 
-These enhancements will build upon the existing modular architecture without requiring significant redesign.
+- Automated testing
+- Alert reliability
+- Dependency and security maintenance
+- Configuration validation
+- Docker and CI validation
+- Logging improvements
+- Bug fixes
+- Documentation maintenance
+
+Large architectural expansions such as multi-host monitoring, incident management, persistent alert-history platforms, or additional notification ecosystems are outside the current Pulse scope.
+
+If a future engineering requirement justifies one of these capabilities, it should be evaluated as a separate major release rather than being treated as unfinished work in the current architecture.
+
+---
+
+## Related Documentation
+
+- [Alerting](./alerting.md)
+- [Configuration](./configuration.md)
+- [Grafana Dashboard](./grafana-dashboard.md)
+- [Logging](./logging.md)
+- [Monitoring Stack](./monitoring-stack.md)
+- [Project Details](./project-details.md)
+- [Roadmap](./roadmap.md)
+- [Setup](./setup.md)
+- [Troubleshooting](./troubleshooting.md)

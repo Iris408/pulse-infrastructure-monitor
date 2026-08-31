@@ -1,12 +1,12 @@
 # Project Details
 
-This document contains extra setup, logging, environment, and learning notes for the Infrastructure Health Monitoring Platform.
+This document contains additional configuration, logging, engineering, and maintenance notes for Pulse.
 
 ---
 
 ## Environment Variables
 
-This project uses environment variables for alerting, threshold configuration, alert cooldowns, and automated refresh timing.
+Pulse uses environment variables for alerting, monitoring thresholds, alert cooldowns, and refresh timing.
 
 Create a `.env` file in the project root:
 
@@ -41,7 +41,7 @@ ALERT_COOLDOWN_SECONDS=1800
 
 ## Logs
 
-The project writes two types of logs.
+Pulse writes two types of operational logs.
 
 | Log File | Purpose |
 | --- | --- |
@@ -67,38 +67,66 @@ The project writes two types of logs.
 
 ---
 
-## What I Learned
+## Engineering Scope
 
-Through this project, I practiced:
+Pulse began as a lightweight Python system-monitoring script and was incrementally developed into a production-style infrastructure monitoring and observability platform.
 
-- Reading system metrics with Python
-- Building a terminal-based monitoring tool
-- Creating threshold-based alerts
-- Sending Slack and email alerts
-- Adding alert cooldown and recovery logic
-- Writing structured logs
-- Creating a FastAPI `/health` endpoint
-- Creating a Prometheus-compatible `/metrics` endpoint
-- Running the project with Docker Compose
-- Adding Docker healthchecks
-- Connecting Prometheus to a FastAPI metrics endpoint
-- Connecting Grafana to Prometheus
-- Creating basic Grafana dashboard panels
-- Validating the health endpoint through GitHub Actions CI/CD
+The completed platform includes:
+
+- CPU, memory, disk, and uptime monitoring
+- Configurable monitoring thresholds
+- Slack and email alerting
+- Alert cooldowns and recovery notifications
+- Structured operational logging
+- FastAPI health and metrics endpoints
+- Prometheus metric collection
+- Grafana visualisation
+- Docker Compose infrastructure
+- Container healthchecks
+- GitHub Actions backend CI
+- Modular application architecture
+
+The current feature cycle is complete. Future engineering work is limited primarily to maintenance, testing, security, dependency updates, reliability improvements, and documentation.
 
 ---
 
-## Development Notes
+## What I Learned
 
-This project started as a beginner Python monitoring script and has been expanded into a production-style monitoring platform.
+Through Pulse, I practised:
 
-Current production-style additions include:
+- Reading and interpreting system metrics with Python
+- Building a terminal-based monitoring tool
+- Designing threshold-based monitoring behaviour
+- Sending Slack and email alerts
+- Implementing alert cooldown and recovery logic
+- Writing structured operational logs
+- Building FastAPI health and metrics endpoints
+- Exposing Prometheus-compatible metrics
+- Running a multi-service monitoring stack with Docker Compose
+- Adding Docker healthchecks
+- Connecting Prometheus to a FastAPI metrics endpoint
+- Connecting Grafana to Prometheus
+- Building Grafana infrastructure dashboard panels
+- Structuring a Python application into maintainable modules
+- Validating backend behaviour through GitHub Actions CI
 
-- Structured logging
-- Configurable alert cooldowns
-- Recovery alerts
-- FastAPI health API
-- Prometheus metrics
-- Docker Compose monitoring stack
-- Grafana dashboard
-- CI/CD health endpoint validation
+---
+
+## Maintenance
+
+Pulse is now maintained as a completed monitoring project rather than an actively expanding feature project.
+
+Maintenance work may include:
+
+- Automated test coverage
+- Alert reliability improvements
+- Dependency and security updates
+- CI workflow improvements
+- Docker validation
+- Configuration improvements
+- Documentation updates
+- Bug fixes and small operational improvements
+
+Large feature additions are outside the current project scope.
+
+See the [Roadmap](./roadmap.md) for the maintenance plan.
